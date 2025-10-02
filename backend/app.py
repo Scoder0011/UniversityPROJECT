@@ -121,137 +121,65 @@ def text_to_pdf(text, output_pdf):
     doc.build(story)
 
 def docx_to_pdf(docx_path, output_pdf):
-    """Convert DOCX to PDF preserving formatting, images, and tables"""
+    """STRICT: Convert DOCX to PDF using LibreOffice only. Fail if not available."""
+    import subprocess
+
+    # Possible LibreOffice commands
+    libreoffice_commands = [
+        'libreoffice',  # Linux
+        'soffice',      # Alternative Linux
+        '/Applications/LibreOffice.app/Contents/MacOS/soffice',  # macOS
+        'C:\\Program Files\\LibreOffice\\program\\soffice.exe',  # Windows
+        'C:\\Program Files (x86)\\LibreOffice\\program\\soffice.exe'
+    ]
+
+    libreoffice_path = None
+    for cmd in libreoffice_commands:
+        try:
+            result = subprocess.run([cmd, '--version'],
+                                    capture_output=True,
+                                    timeout=5,
+                                    text=True)
+            if result.returncode == 0:
+                libreoffice_path = cmd
+                print(f"✅ Found LibreOffice: {cmd}")
+                break
+        except Exception:
+            continue
+
+    if not libreoffice_path:
+        raise RuntimeError("❌ LibreOffice not found on server. Please install LibreOffice.")
+
     try:
-        # Try using LibreOffice for high-quality conversion
-        import subprocess
-        
-        # Check if LibreOffice is available
-        libreoffice_commands = [
-            'libreoffice',  # Linux
-            'soffice',      # Alternative Linux
-            '/Applications/LibreOffice.app/Contents/MacOS/soffice',  # macOS
-            'C:\\Program Files\\LibreOffice\\program\\soffice.exe',  # Windows
-            'C:\\Program Files (x86)\\LibreOffice\\program\\soffice.exe'  # Windows 32-bit
-        ]
-        
-        libreoffice_path = None
-        for cmd in libreoffice_commands:
-            try:
-                result = subprocess.run([cmd, '--version'], 
-                                      capture_output=True, 
-                                      timeout=5,
-                                      text=True,
-                                      stdin=subprocess.DEVNULL)  # Prevent stdin prompts
-                if result.returncode == 0:
-                    libreoffice_path = cmd
-                    break
-            except (FileNotFoundError, subprocess.TimeoutExpired):
-                continue
-        
-        if libreoffice_path:
-            # Use LibreOffice for conversion (best quality)
-            output_dir = os.path.dirname(output_pdf)
-            
-            # Full headless conversion with all safety flags
-            result = subprocess.run(
-                [
-                    libreoffice_path,
-                    '--headless',                    # No GUI
-                    '--invisible',                   # Don't show window
-                    '--nocrashreport',              # Disable crash reporting
-                    '--nodefault',                  # Don't start with default document
-                    '--nofirststartwizard',         # Skip first-start wizard
-                    '--nolockcheck',                # Don't check for file locks
-                    '--nologo',                     # Don't show splash screen
-                    '--norestore',                  # Don't restore windows
-                    '--convert-to', 'pdf',
-                    '--outdir', output_dir,
-                    docx_path
-                ],
-                capture_output=True,
-                timeout=60,
-                stdin=subprocess.DEVNULL,           # No stdin input
-                creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0  # Windows: no console window
-            )
-            
-            # LibreOffice creates PDF with same name as DOCX
-            base_name = os.path.splitext(os.path.basename(docx_path))[0]
-            temp_pdf = os.path.join(output_dir, f"{base_name}.pdf")
-            
-            if os.path.exists(temp_pdf):
-                os.rename(temp_pdf, output_pdf)
-                print(f"✓ LibreOffice conversion successful: {os.path.basename(docx_path)}")
-                return
-            else:
-                print(f"⚠ LibreOffice conversion failed, using fallback")
-        
+        output_dir = os.path.dirname(output_pdf)
+        result = subprocess.run(
+            [
+                libreoffice_path,
+                '--headless',
+                '--nologo',
+                '--nofirststartwizard',
+                '--norestore',
+                '--convert-to', 'pdf',
+                '--outdir', output_dir,
+                docx_path
+            ],
+            capture_output=True,
+            timeout=60
+        )
+
+        base_name = os.path.splitext(os.path.basename(docx_path))[0]
+        temp_pdf = os.path.join(output_dir, f"{base_name}.pdf")
+
+        if os.path.exists(temp_pdf):
+            os.rename(temp_pdf, output_pdf)
+            print(f"✅ LibreOffice conversion SUCCESS: {os.path.basename(docx_path)}")
+            return
+        else:
+            raise RuntimeError(f"❌ LibreOffice did not produce output for {os.path.basename(docx_path)}")
+
     except Exception as e:
-        print(f"⚠ LibreOffice conversion error: {e}, using fallback")
-    
-    # Fallback: Manual conversion with python-docx + reportlab
-    print(f"→ Using manual conversion for: {os.path.basename(docx_path)}")
-    try:
-        from reportlab.platypus import Table, TableStyle
-        from reportlab.lib import colors
-        
-        doc = SimpleDocTemplate(output_pdf, pagesize=letter)
-        story = []
-        styles = getSampleStyleSheet()
-        
-        # Custom styles
-        normal_style = ParagraphStyle(
-            'CustomNormal',
-            parent=styles['Normal'],
-            fontSize=11,
-            leading=14,
-            spaceAfter=6
-        )
-        
-        heading_style = ParagraphStyle(
-            'CustomHeading',
-            parent=styles['Heading1'],
-            fontSize=14,
-            textColor='#1a1a1a',
-            spaceAfter=12,
-            spaceBefore=12
-        )
-        
-        source_doc = Document(docx_path)
-        
-        # Process paragraphs and extract images
-        for para in source_doc.paragraphs:
-            if para.text.strip():
-                if 'Heading' in para.style.name:
-                    story.append(Paragraph(para.text, heading_style))
-                else:
-                    story.append(Paragraph(para.text, normal_style))
-            
-            # Check for inline images in runs
-            for run in para.runs:
-                if 'graphicData' in run._element.xml:
-                    # Try to extract embedded image
-                    try:
-                        for rel in run.part.rels.values():
-                            if "image" in rel.target_ref:
-                                image_data = rel.target_part.blob
-                                img = Image.open(io.BytesIO(image_data))
-                                
-                                # Resize if needed
-                                max_width = 6 * inch
-                                max_height = 8 * inch
-                                img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
-                                
-                                img_buffer = io.BytesIO()
-                                img.save(img_buffer, format='PNG')
-                                img_buffer.seek(0)
-                                
-                                story.append(Spacer(1, 0.1 * inch))
-                                story.append(RLImage(img_buffer, width=img.size[0], height=img.size[1]))
-                                story.append(Spacer(1, 0.1 * inch))
-                    except Exception as e:
-                        print(f"Error extracting inline image: {e}")
-        
+        raise RuntimeError(f"❌ LibreOffice conversion failed: {e}")
+
         # Process tables with better formatting
         for table in source_doc.tables:
             table_data = []
