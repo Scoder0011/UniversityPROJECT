@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal File Combiner Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <!-- Logo -->
+            <div class="logo">📁 File Combiner Pro</div>
+
+            <!-- Mode Toggle -->
+            <nav class="mode-toggle">
+                <button class="mode-btn active" data-mode="standard">Quick Upload</button>
+                <button class="mode-btn" data-mode="checklist">Checklist Mode</button>
+            </nav>
+
+            <!-- User -->
+            <div class="user-info">
+                <div class="user-avatar">👤</div>
+                <span class="user-name">User-12345</span>
+            </div>
+        </div>
+    </header>
+
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <!-- Standard Upload Mode -->
+            <div class="mode-content active" id="standardMode">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">☁️</div>
+                    <div class="upload-text">Drag & drop files here</div>
+                    <div class="upload-subtext">or tap to browse</div>
+                    <input type="file" id="fileInput" multiple accept=".pdf,.docx,.pptx,.txt,.jpg,.jpeg,.png,.gif"
+                        style="display: none;">
+                </div>
+
+                <div class="files-list" id="filesList" style="display: none;">
+                    <h3 style="margin-bottom: 20px; color: #1a1a2e;">Uploaded Files (<span id="fileCount">0</span>)</h3>
+                    <div id="filesContainer"></div>
+                </div>
+
+                <div class="action-buttons" id="standardActions" style="display: none;">
+                    <button class="action-btn combine-btn" id="combineBtn">🔗 Combine to PDF</button>
+                    <button class="action-btn clear-btn" id="clearBtn">Clear All</button>
+                </div>
+
+                <div class="status-message" id="statusMessage"></div>
+            </div>
+
+            <!-- Checklist Mode -->
+            <div class="mode-content" id="checklistMode">
+                <div class="checklist-controls">
+                    <button class="add-checklist-btn" id="addChecklistBtn">➕ Add New Checklist Section</button>
+                </div>
+
+                <div id="checklistsContainer"></div>
+
+                <div class="action-buttons" id="checklistActions" style="display: none;">
+                    <button class="action-btn combine-btn" id="combineChecklistBtn">📑 Generate PDF with
+                        Dividers</button>
+                    <button class="action-btn clear-btn" id="clearChecklistBtn">Clear All</button>
+                </div>
+
+                <div class="status-message" id="checklistStatusMessage"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <!-- Left -->
+            <div class="footer-left">
+                <div class="footer-logo">📁 File Combiner Pro</div>
+                <p class="footer-tagline">Merge, organize & simplify your files in one click.</p>
+            </div>
+
+            <!-- Center -->
+            <div class="footer-links">
+                <a href="about.html">About</a>
+                <a href="help.html">Help</a>
+                <a href="contact.html">Contact</a>
+                <a href="privacy.html">Privacy</a>
+            </div>
+        </div>
+
+        <!-- Bottom bar -->
+        <div class="footer-bottom">
+            <p>© 2025 File Combiner Pro. Crafted with ❤️ by <strong>Scoder</strong></p>
+        </div>
+    </div>
+
+</body>
+<script src="script.js"></script>
+
+</html>
