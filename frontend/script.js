@@ -407,10 +407,7 @@ function fetchWithTimeout(resource, options = {}, timeout = 120000) { // 2 minut
         .finally(() => clearTimeout(id));
 }
 
-const response = await fetchWithTimeout(`${API_BASE}/combine-checklist`, {
-    method: 'POST',
-    body: formData
-});
+
 
 
 // Initialize with example checklist
