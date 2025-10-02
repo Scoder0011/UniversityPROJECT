@@ -1,4 +1,10 @@
 const API_BASE = 'https://file-combiner.onrender.com';
+function fetchWithTimeout(resource, options = {}, timeout = 120000) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    return fetch(resource, { ...options, signal: controller.signal })
+        .finally(() => clearTimeout(id));
+}
 // Global state
 let currentMode = 'standard';
 let standardFiles = [];
@@ -125,12 +131,11 @@ combineBtn.addEventListener('click', async () => {
             formData.append('files', file);
         });
 
-        const API_BASE = 'https://file-combiner.onrender.com';
-
-        const response = await fetch(`${API_BASE}/combine`, {
+        const response = await fetchWithTimeout(`${API_BASE}/combine`, {
             method: 'POST',
             body: formData
         });
+
 
 
         if (!response.ok) throw new Error('Combination failed');
@@ -318,10 +323,10 @@ combineChecklistBtn.addEventListener('click', async () => {
 
         formData.append('checklist_data', JSON.stringify(checklistData));
 
-       const response = await fetch(`${API_BASE}/combine-checklist`, {
-    method: 'POST',
-    body: formData
-});
+        const response = await fetch(`${API_BASE}/combine-checklist`, {
+            method: 'POST',
+            body: formData
+        });
 
 
         if (!response.ok) throw new Error('Combination failed');
@@ -396,16 +401,16 @@ function hideChecklistStatus() {
 }
 
 function fetchWithTimeout(resource, options = {}, timeout = 120000) { // 2 minutes
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
-  return fetch(resource, {...options, signal: controller.signal})
-    .finally(() => clearTimeout(id));
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    return fetch(resource, { ...options, signal: controller.signal })
+        .finally(() => clearTimeout(id));
 }
 
-const response = await fetchWithTimeout(`${API_BASE}/combine`, {
-  method: 'POST',
-  body: formData
-}, 120000);
+const response = await fetchWithTimeout(`${API_BASE}/combine-checklist`, {
+    method: 'POST',
+    body: formData
+});
 
 
 // Initialize with example checklist
