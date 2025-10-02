@@ -165,55 +165,118 @@
             font-size: 1.2rem;
         }
 
-        /* Team Section */
-        .team {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 24px;
-            margin-top: 32px;
-        }
+        /* Grid wrapper */
+.developer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-top: 32px;
+}
 
-        .member {
-            background: rgba(102, 126, 234, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 12px;
-            padding: 28px 20px;
-            text-align: center;
-            transition: var(--transition-base);
-        }
+/* Each card */
+.dev-card {
+  background: rgba(102, 126, 234, 0.08);
+  border: 1px solid rgba(102, 126, 234, 0.25);
+  border-radius: 16px;
+  padding: 28px 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
 
-        .member:hover {
-            background: rgba(102, 126, 234, 0.15);
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
-            border-color: var(--color-primary);
-        }
+.dev-card:hover {
+  background: rgba(102, 126, 234, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  border-color: var(--color-primary);
+}
 
-        .member-avatar {
-            width: 110px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--color-primary), #a78bfa);
-            border-radius: 9px;
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: bold;
-            color: #fff;
-        }
+/* Avatar */
+.dev-avatar {
+  width: 110px;
+  height: 50px;
+  background: linear-gradient(135deg, var(--color-primary), #a78bfa);
+  border-radius: 19px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
 
-        .member h3 {
-            margin: 12px 0 6px;
-            color: #fff;
-            font-size: 1.1rem;
-        }
+/* Roles */
+.roles {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+}
 
-        .member p {
-            font-size: 0.9rem;
-            color: var(--color-neutral-400);
-            margin: 0;
-        }
+.roles li {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  color: #c7d2fe;
+  font-size: 0.9rem;
+  margin: 6px 0;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+/* Availability badge */
+.availability {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+/* Socials */
+.social-boxes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.social-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  transition: all 0.25s ease;
+}
+
+.social-box:hover {
+  background: rgba(102, 126, 234, 0.15);
+  border-color: rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+}
+
+.social-box img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .developer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 
         /* Footer - Ultra Compact */
         .footer {
@@ -440,16 +503,49 @@
             </ul>
 
             <h2>Meet the Developer</h2>
-            <div class="team">
-                <div class="member">
-                    <div class="member-avatar">Scoder</div>
+            <div class="developer-grid">
+                <!-- Left: Developer info -->
+                <div class="dev-card">
+                    <div class="dev-avatar">Scoder</div>
                     
-                    <p>Frontend Engineer</p>
-                    <p>Backend & Security</p>
-                    <p>UI/UX Designer</p>
-                    <p>Product & Strategy</p>
+                    <ul class="roles">
+                        <li>Frontend Engineer</li>
+                        <li>Backend & Security</li>
+                        <li>UI/UX Designer</li>
+                        <li>Product & Strategy</li>
+                    </ul>
+                    <div class="availability">💼 Available for projects</div>
+                </div>
+
+                <!-- Right: Social links -->
+                <div class="dev-card">
+                    <h3>Connect with me</h3>
+                    <div class="social-boxes">
+                        <div class="social-box">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+                                alt="GitHub">
+                            <span>scoder0011</span>
+                        </div>
+                        <div class="social-box">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg"
+                                alt="LinkedIn">
+                            <span>linkedin.com/in/scoder0011</span>
+                        </div>
+                        <div class="social-box">
+                            <img src="https://cdn-icons-png.flaticon.com/512/5968/5968756.png" alt="Discord">
+                            <span>Scoder0011</span>
+                        </div>
+                        <div class="social-box">
+                            <img src="https://cdn-icons-png.flaticon.com/512/281/281769.png" alt="Gmail">
+                            <span>scoder0011@gmail.com</span>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+
+        </div>
+
     </main>
 
     <div class="footer">
@@ -469,7 +565,8 @@
             <p>© 2025 File Combiner Pro. Crafted with ❤️ by <strong>Scoder</strong></p>
             <a href="https://manavrachna.edu.in/" target="_blank" rel="noopener noreferrer" class="sponsor-inline">
                 <span>Sponsored by</span>
-                <img src="https://resurrection.manavrachna.edu.in/_next/static/media/mrlogo.6ab959ea.png" alt="Manav Rachna University Logo" class="sponsor-logo">
+                <img src="https://resurrection.manavrachna.edu.in/_next/static/media/mrlogo.6ab959ea.png"
+                    alt="Manav Rachna University Logo" class="sponsor-logo">
             </a>
         </div>
     </div>
