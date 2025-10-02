@@ -24,7 +24,8 @@ from PIL import Image
 import io
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "https://your-frontend.onrender.com"}})
+
 
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'doc', 'pptx', 'ppt', 'txt', 'jpg', 'jpeg', 'png', 'gif'}
 TEMP_DIR = tempfile.gettempdir()
@@ -910,9 +911,5 @@ if __name__ == '__main__':
     print("=" * 60)
     print("Universal File Combiner Backend v2.0")
     print("=" * 60)
-    print("Server starting on http://localhost:5000")
-    print(f"Supported input formats: {', '.join(sorted(ALLOWED_EXTENSIONS))}")
-    print("Supported output formats: PDF, DOCX, PPTX")
-    print("\n✨ NEW: Preserves original PDF formatting!")
-    print("=" * 60)
-    app.run(debug=False, host='0.0.0.0', port=5000)
+    port = int(os.environ.get("PORT", 5000))  # use Render's PORT, fallback to 5000 locally
+    app.run(debug=False, host='0.0.0.0', port=port)
