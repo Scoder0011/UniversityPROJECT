@@ -858,51 +858,6 @@ def index():
     }
 import os, sys, subprocess
 
-def docx_to_pdf(input_path, output_path):
-    """Convert DOCX to PDF using LibreOffice headless mode (no terminal popups)."""
-    soffice = r"C:\Program Files\LibreOffice\program\soffice.exe"  # adjust if your path is different
-    cmd = [
-        soffice,
-        "--headless",
-        "--nologo",
-        "--nofirststartwizard",
-        "--norestore",
-        "--invisible",
-        "--convert-to", "pdf",
-        "--outdir", os.path.dirname(output_path),
-        input_path
-    ]
-    # prevent "Press Enter to continue" windows on Windows
-    creationflags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
-    subprocess.run(cmd, check=True, creationflags=creationflags)
-    # output will be created automatically by LibreOffice in the outdir
-    # ensure it's at expected location
-    generated_pdf = os.path.join(os.path.dirname(output_path),
-                                 os.path.splitext(os.path.basename(input_path))[0] + ".pdf")
-    if os.path.exists(generated_pdf):
-        os.replace(generated_pdf, output_path)
-
-def pptx_to_pdf(input_path, output_path):
-    """Convert PPTX to PDF using LibreOffice headless mode (no terminal popups)."""
-    soffice = r"C:\Program Files\LibreOffice\program\soffice.exe"  # adjust path if needed
-    cmd = [
-        soffice,
-        "--headless",
-        "--nologo",
-        "--nofirststartwizard",
-        "--norestore",
-        "--invisible",
-        "--convert-to", "pdf",
-        "--outdir", os.path.dirname(output_path),
-        input_path
-    ]
-    creationflags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
-    subprocess.run(cmd, check=True, creationflags=creationflags)
-    generated_pdf = os.path.join(os.path.dirname(output_path),
-                                 os.path.splitext(os.path.basename(input_path))[0] + ".pdf")
-    if os.path.exists(generated_pdf):
-        os.replace(generated_pdf, output_path)
-
 
 
     
