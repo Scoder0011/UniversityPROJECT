@@ -535,13 +535,14 @@ if (combineUniDocBtn) {
     try {
       const formData = new FormData();
       let fileIndex = 0;
-      for (const [key, payload] of uniDocFiles.entries()) {
-        if (Array.isArray(payload)) {
-          payload.forEach(f => formData.append(`file_${fileIndex++}`, f));
-        } else if (payload instanceof File) {
-          formData.append(`file_${fileIndex++}`, payload);
-        }
-      }
+     for (const [key, payload] of uniDocFiles.entries()) {
+  if (Array.isArray(payload)) {
+    payload.forEach(f => formData.append("files", f));
+  } else if (payload instanceof File) {
+    formData.append("files", payload);
+  }
+}
+
 
       // call your API endpoint (example)
       const res = await fetchWithTimeout(`${API_BASE}/combine-unidoc`, { method: 'POST', body: formData });
