@@ -234,7 +234,8 @@
       <input type="password" id="password" placeholder="Create a secure password" required>
     </div>
     
-    <button onclick="register()">Create Account</button>
+    <button type="button" onclick="register()">Create Account</button>
+
     
     <div class="divider"></div>
     
@@ -245,26 +246,32 @@
 
   <script>
     async function register() {
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-      
-      const response = await fetch("https://your-backend.onrender.com/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      });
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const messageEl = document.getElementById("message");
 
-      const data = await response.json();
-      const messageEl = document.getElementById("message");
-      messageEl.innerText = data.message || data.error;
-      
-      // Add styling based on response
-      if (data.error) {
-        messageEl.className = 'error';
-      } else {
-        messageEl.className = 'success';
-      }
-    }
+  if (!username || !password) {
+    messageEl.innerText = "Please fill out all fields.";
+    messageEl.className = 'error';
+    return;
+  }
+
+  try {
+    const response = await fetch("https://your-backend.onrender.com/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await response.json();
+    messageEl.innerText = data.message || data.error;
+    messageEl.className = data.error ? 'error' : 'success';
+  } catch (err) {
+    messageEl.innerText = "Network error, try again.";
+    messageEl.className = 'error';
+  }
+}
+
   </script>
 </body>
 </html>
