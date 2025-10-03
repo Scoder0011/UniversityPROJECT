@@ -521,7 +521,6 @@ if (clearUniDocBtn) {
   });
 }
 
-// (optional) combine handler skeleton that gathers files from uniDocFiles map
 if (combineUniDocBtn) {
   combineUniDocBtn.addEventListener('click', async () => {
     if (!uniDocFiles || uniDocFiles.size === 0) {
@@ -534,17 +533,25 @@ if (combineUniDocBtn) {
 
     try {
       const formData = new FormData();
-      let fileIndex = 0;
-     for (const [key, payload] of uniDocFiles.entries()) {
-  if (Array.isArray(payload)) {
-    payload.forEach(f => formData.append("files", f));
-  } else if (payload instanceof File) {
-    formData.append("files", payload);
-  }
-}
 
+      // 1) Append all files under the same key "files"
+      for (const [key, payload] of uniDocFiles.entries()) {
+        if (Array.isArray(payload)) {
+          payload.forEach(f => formData.append("files", f));
+        } else if (payload instanceof File) {
+          formData.append("files", payload);
+        }
+      }
 
-      // call your API endpoint (example)
+      // 2) Append the course meta fields (make sure inputs in HTML have these IDs)
+      formData.append('program', document.querySelector('#programInput')?.value || '');
+      formData.append('code', document.querySelector('#codeInput')?.value || '');
+      formData.append('coordinator', document.querySelector('#coordinatorInput')?.value || '');
+      formData.append('name', document.querySelector('#nameInput')?.value || '');
+      formData.append('faculty', document.querySelector('#facultyInput')?.value || '');
+      formData.append('ltpc', document.querySelector('#ltpcInput')?.value || '');
+
+      // 3) Call backend
       const res = await fetchWithTimeout(`${API_BASE}/combine-unidoc`, { method: 'POST', body: formData });
       if (!res.ok) throw new Error('Merge failed');
       const blob = await res.blob();
@@ -557,6 +564,7 @@ if (combineUniDocBtn) {
     }
   });
 }
+
 
 
 
