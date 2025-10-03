@@ -764,6 +764,71 @@ def combine_checklist():
                     os.remove(p)
             except Exception:
                 pass
+
+
+@app.route('/combine-unidoc', methods=['POST'])
+def combine_unidoc():
+    """
+    Simple UniDoc merge: works like /combine,
+    but called from the UniDoc Builder mode in frontend.
+    """
+    if not request.files:
+        return {'error': 'No files uploaded'}, 400
+
+    files = []
+    output_path = None
+    temp_files = []
+
+    try:
+        # Collect and save all uploaded files
+        for key in request.files:
+            fs = request.files[key]
+            if fs.filename == '':
+                continue
+            if not allowed_file(fs.filename):
+                return {'error': f'File type not allowed: {fs.filename}'}, 400
+
+            safe_name = secure_filename(fs.filename)
+            temp_path = os.path.join(TEMP_DIR, f"{datetime.now().timestamp()}_{safe_name}")
+            fs.save(temp_path)
+
+            temp_files.append(temp_path)
+            files.append({
+                'path': temp_path,
+                'name': safe_name,
+                'type': get_file_type(safe_name)
+            })
+
+        if not files:
+            return {'error': 'No valid files'}, 400
+
+        # Output merged PDF
+        output_filename = f'unidoc_combined_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+        output_path = os.path.join(TEMP_DIR, output_filename)
+
+        combine_to_pdf(files, output_path)
+
+        return send_file(
+            output_path,
+            as_attachment=True,
+            download_name=output_filename,
+            mimetype='application/pdf'
+        )
+
+    except Exception as e:
+        import traceback
+        print("ERROR in /combine-unidoc:", traceback.format_exc())
+        return {'error': str(e)}, 500
+
+    finally:
+        # cleanup temp files (not the final merged one)
+        for p in temp_files:
+            try:
+                if os.path.exists(p):
+                    os.remove(p)
+            except:
+                pass
+
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
