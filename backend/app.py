@@ -126,6 +126,60 @@ def text_to_pdf(text, output_pdf):
 def docx_to_pdf(docx_path, output_pdf):
     """STRICT: Convert DOCX to PDF using LibreOffice only. Fail if not available."""
     import subprocess
+    def create_cover_page(output_path):
+    """Create cover page for UniDoc"""
+    c = canvas.Canvas(output_path, pagesize=letter)
+    width, height = letter
+    c.setFont("Helvetica-Bold", 36)
+    c.drawCentredString(width/2, height - 2*inch, "Course File")
+    c.setFont("Helvetica-Bold", 24)
+    c.drawCentredString(width/2, height - 3*inch, "Documentation")
+    c.setFont("Helvetica", 12)
+    c.drawCentredString(width/2, height - 4*inch, f"Generated: {datetime.now().strftime('%B %d, %Y')}")
+    c.showPage()
+    c.save()
+
+def create_course_info_page(course_data, output_path):
+    """Create course information page"""
+    c = canvas.Canvas(output_path, pagesize=letter)
+    width, height = letter
+    c.setFont("Helvetica-Bold", 20)
+    c.drawString(72, height - 1.5*inch, "Course Information")
+    c.setFont("Helvetica-Bold", 12)
+    y = height - 2.5*inch
+    fields = [
+        ('Program & Semester', course_data.get('program', 'N/A')),
+        ('Course Code', course_data.get('code', 'N/A')),
+        ('Course Name', course_data.get('name', 'N/A')),
+        ('Course Coordinator', course_data.get('coordinator', 'N/A')),
+        ('Theory Faculty', course_data.get('faculty', 'N/A')),
+        ('LTPC', course_data.get('ltpc', 'N/A'))
+    ]
+    for label, value in fields:
+        c.setFont("Helvetica-Bold", 11)
+        c.drawString(72, y, f"{label}:")
+        c.setFont("Helvetica", 11)
+        c.drawString(72, y - 15, str(value))
+        y -= 40
+    c.showPage()
+    c.save()
+
+def create_index_page(file_names, output_path):
+    """Create index page"""
+    c = canvas.Canvas(output_path, pagesize=letter)
+    width, height = letter
+    c.setFont("Helvetica-Bold", 20)
+    c.drawString(72, height - 1.5*inch, "Table of Contents")
+    c.setFont("Helvetica", 11)
+    y = height - 2.5*inch
+    for i, name in enumerate(file_names, 1):
+        if y < 100:
+            c.showPage()
+            y = height - inch
+        c.drawString(72, y, f"{i}. {name}")
+        y -= 25
+    c.showPage()
+    c.save()
 
     # Possible LibreOffice commands
     libreoffice_commands = [
