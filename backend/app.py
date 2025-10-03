@@ -22,6 +22,7 @@ from reportlab.lib import colors
 from reportlab.pdfgen import canvas
 from PIL import Image
 import io
+from auth import register_auth_routes
 
 app = Flask(__name__)
 CORS(app)
