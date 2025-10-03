@@ -245,32 +245,27 @@
   </div>
 
   <script>
-    async function register() {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const messageEl = document.getElementById("message");
+     async function register() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
 
-  if (!username || !password) {
-    messageEl.innerText = "Please fill out all fields.";
-    messageEl.className = 'error';
-    return;
-  }
-
-  try {
-    const response = await fetch("https://your-backend.onrender.com/auth/register", {
+    const response = await fetch("https://file-combiner.onrender.com/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password })
     });
 
     const data = await response.json();
+    const messageEl = document.getElementById("message");
     messageEl.innerText = data.message || data.error;
-    messageEl.className = data.error ? 'error' : 'success';
-  } catch (err) {
-    messageEl.innerText = "Network error, try again.";
-    messageEl.className = 'error';
+
+    // Add styling based on response
+    if (data.error) {
+      messageEl.className = 'error';
+    } else {
+      messageEl.className = 'success';
+    }
   }
-}
 
   </script>
 </body>
