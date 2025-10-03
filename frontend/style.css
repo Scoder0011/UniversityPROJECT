@@ -5,7 +5,7 @@
     /* Color Palette */
     --color-primary: #667eea;
     --color-primary-dark: #764ba2;
-    --color-secondary: #1a1a2e;
+    --color-secondary: #ffffff;
     --color-tertiary: #16213e;
     --color-accent: #0f3460;
     
@@ -30,7 +30,7 @@
     --color-neutral-200: #f0f0f0;
     --color-neutral-300: #e0e0e0;
     --color-neutral-400: #999;
-    --color-neutral-500: #666;
+    --color-neutral-500: #e0dada;
     --color-neutral-900: #1a1a2e;
     
     --color-white: #ffffff;
@@ -132,7 +132,6 @@ textarea {
 /* ==========================================================================
    Header Component
    ========================================================================== */
-/* Header Base */
 .header {
   background: var(--color-overlay);
   backdrop-filter: blur(15px);
@@ -158,7 +157,7 @@ textarea {
 /* Logo */
 .logo {
   font-size: clamp(1.2rem, 2vw, 1.6rem);
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-black);
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -185,53 +184,24 @@ textarea {
   color: var(--color-neutral-400);
   background: transparent;
   transition: all var(--transition-base);
+  white-space: nowrap;
+  position: relative;
+}
+
+.mode-btn:hover:not(.active) {
+  color: var(--color-primary);
+  background: rgba(102, 126, 234, 0.1);
 }
 
 .mode-btn.active {
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
   color: white;
   box-shadow: 0 3px 10px rgba(102,126,234,0.4);
-}
-/* ==========================================================================
-   Mode Toggle Component
-   ========================================================================== */
-.mode-toggle {
-    display: flex;
-    gap: var(--space-sm);
-    background: var(--color-neutral-200);
-    padding: var(--space-xs);
-    border-radius: var(--radius-lg);
-    position: relative;
-}
-
-.mode-btn {
-    padding: var(--space-sm) var(--space-lg);
-    border: none;
-    background: transparent;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-weight: var(--font-weight-bold);
-    font-size: 0.9rem;
-    transition: all var(--transition-base);
-    color: var(--color-neutral-500);
-    position: relative;
-    white-space: nowrap;
-}
-
-.mode-btn:hover:not(.active) {
-    color: var(--color-primary);
-    background: rgba(102, 126, 234, 0.1);
-}
-
-.mode-btn.active {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-    color: var(--color-white);
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-1px);
+  transform: translateY(-1px);
 }
 
 .mode-btn:active {
-    transform: scale(0.98);
+  transform: scale(0.98);
 }
 
 /* ==========================================================================
@@ -250,8 +220,8 @@ textarea {
     color: var(--color-secondary);
     border: 1px solid rgba(102, 126, 234, 0.15);
     transition: all var(--transition-base);
-    text-decoration: none;   /* 🔑 remove link underline */
-    cursor: pointer;         /* 🔑 show hand cursor */
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .user-info:hover {
@@ -259,7 +229,7 @@ textarea {
         rgba(102, 126, 234, 0.15), 
         rgba(118, 75, 162, 0.15));
     transform: translateY(-2px);
-    text-decoration: none;   /* just to be safe */
+    text-decoration: none;
 }
 
 /* ==========================================================================
@@ -274,13 +244,12 @@ textarea {
 }
 
 .container {
-    background: var(--color-overlay);
+    
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(30px);
     border-radius: var(--radius-4xl);
     box-shadow: var(--shadow-2xl);
-    padding: 45px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin: 10px;
     will-change: transform;
 }
 
@@ -520,7 +489,335 @@ textarea {
 }
 
 /* ==========================================================================
-   File List Component
+   UNI DOC BUILDER MODE - Course File Contents Styles
+   ========================================================================== */
+   #unidocbuilderMode .container {
+  display: none;
+}
+#unidocActions {
+  justify-content: center; /* or flex-start / flex-end */
+}
+
+
+.cfc {
+    width: 100%;
+}
+
+.cfc-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 3px solid var(--color-neutral-200);
+}
+
+.cfc-header h2 {
+    font-size: 2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1.5rem;
+}
+
+/* Course Meta Grid */
+.course-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.2rem;
+}
+
+.course-meta label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.course-meta strong {
+    font-size: 0.8rem;
+    color: var(--color-neutral-500);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.course-meta input {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--color-neutral-300);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all var(--transition-base);
+    background: var(--color-white);
+    color: var(--color-secondary);
+}
+
+.course-meta input:hover {
+    border-color: rgba(102, 126, 234, 0.4);
+}
+
+.course-meta input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.course-meta input::placeholder {
+    color: var(--color-neutral-400);
+}
+
+/* Group Container */
+.group {
+    margin:1.5rem 0;
+    border: 2px solid rgba(102, 126, 234, 0.15);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    transition: all var(--transition-base);
+    background: linear-gradient(135deg, var(--color-neutral-100), var(--color-white));
+}
+
+.group:hover {
+    border-color: rgba(102, 126, 234, 0.3);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Toggle Button */
+.toggle-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    color: white;
+    padding: 1.1rem 1.5rem;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: left;
+    transition: all var(--transition-base);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: inherit;
+}
+
+.toggle-btn:hover {
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    box-shadow: var(--shadow-lg);
+}
+
+.toggle-btn:active {
+    transform: scale(0.98);
+}
+
+.toggle-btn.small {
+    width: auto;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    background: var(--color-neutral-400);
+    border-radius: var(--radius-sm);
+    margin-left: auto;
+    font-weight: 600;
+}
+
+.toggle-btn.small:hover {
+    background: var(--color-neutral-500);
+}
+
+/* Panel Content */
+.panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+    background: var(--color-white);
+}
+
+.panel.active {
+    max-height: 5000px;
+    padding: 1.5rem;
+    animation: slideDown 0.4s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Items List */
+.items {
+    list-style: none;
+}
+
+.items > li {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    background: linear-gradient(135deg, var(--color-neutral-100), var(--color-white));
+    border-radius: var(--radius-lg);
+    border: 2px solid rgba(102, 126, 234, 0.08);
+    transition: all var(--transition-base);
+    gap: 1rem;
+}
+
+.items > li:hover {
+    border-color: rgba(102, 126, 234, 0.2);
+    box-shadow: var(--shadow-hover);
+    transform: translateX(5px);
+}
+
+.items > li:last-child {
+    margin-bottom: 0;
+}
+
+/* Index Number */
+.idx {
+    min-width: 2.5rem;
+    font-weight: 900;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Title */
+.title {
+    flex: 1;
+    font-weight: 600;
+    color: var(--color-secondary);
+    font-size: 0.95rem;
+}
+
+/* Controls Container */
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all var(--transition-base);
+    font-family: inherit;
+}
+
+.btn.upload {
+    background: var(--color-success);
+    color: white;
+}
+
+.btn.upload:hover {
+    background: #229954;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+.btn.preview {
+    background: var(--color-warning);
+    color: white;
+}
+
+.btn.preview:hover:not(:disabled) {
+    background: #d35400;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+}
+
+.btn.delete {
+    background: var(--color-error);
+    color: white;
+}
+
+.btn.delete:hover:not(:disabled) {
+    background: #e74c3c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+/* Filename Display */
+.filename {
+    font-size: 0.8rem;
+    color: var(--color-success);
+    font-weight: 600;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Sub Items */
+.sub-items {
+    list-style: none;
+    margin: 1rem 0 0 3rem;
+    padding-left: 1.5rem;
+    border-left: 3px solid rgba(102, 126, 234, 0.2);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+
+.sub-items.active {
+    max-height: 2000px;
+    margin-top: 1rem;
+}
+
+.sub-items li {
+    padding: 0.75rem;
+    margin-bottom: 0.6rem;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.sub-items li:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(102, 126, 234, 0.2);
+    transform: translateX(3px);
+}
+
+.sub-items li:last-child {
+    margin-bottom: 0;
+}
+
+.sub-title {
+    flex: 1;
+    color: var(--color-neutral-500);
+    font-size: 0.9rem;
+    font-weight: 500;
+    min-width: 200px;
+}
+
+/* File Input Hidden */
+.file-input {
+    display: none;
+}
+
+/* ==========================================================================
+   File List Component (Shared between modes)
    ========================================================================== */
 .files-list {
     margin-top: var(--space-xl);
@@ -537,6 +834,7 @@ textarea {
     border: 2px solid rgba(102, 126, 234, 0.08);
     transition: all var(--transition-base);
     cursor: pointer;
+    position: relative;
 }
 
 .file-item:hover {
@@ -549,12 +847,30 @@ textarea {
     margin-bottom: 0;
 }
 
+.file-item::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    background: linear-gradient(90deg, 
+        var(--color-primary), 
+        var(--color-primary-dark));
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+    transition: width var(--transition-base);
+}
+
+.file-item:hover::after {
+    width: 4px;
+}
+
 .file-info {
     display: flex;
     align-items: center;
     gap: var(--space-md);
     flex: 1;
-    min-width: 0; /* Enable text truncation */
+    min-width: 0;
 }
 
 .file-icon {
@@ -705,6 +1021,31 @@ textarea {
     transform: translateY(0);
 }
 
+/* Ripple effect for buttons */
+.action-btn::after,
+.mode-btn::after,
+.add-checklist-btn::after,
+.delete-checklist-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: var(--radius-round);
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.action-btn:active::after,
+.mode-btn:active::after,
+.add-checklist-btn:active::after,
+.delete-checklist-btn:active::after {
+    width: 300px;
+    height: 300px;
+}
+
 /* ==========================================================================
    Status Messages
    ========================================================================== */
@@ -731,6 +1072,27 @@ textarea {
     border: 2px solid var(--color-success-border);
 }
 
+.status-message.success::before {
+    content: '✓';
+    display: inline-block;
+    animation: successCheckmark 0.6s ease;
+}
+
+@keyframes successCheckmark {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(360deg);
+        opacity: 1;
+    }
+}
+
 .status-message.error {
     background: var(--color-error-light);
     color: var(--color-error-dark);
@@ -741,10 +1103,22 @@ textarea {
     background: var(--color-info-light);
     color: var(--color-info-dark);
     border: 2px solid var(--color-info-border);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+    }
 }
 
 /* ==========================================================================
-   FIXED Footer Component - Ultra Compact
+   Footer Component
    ========================================================================== */
 .footer {
   background: rgba(30, 33, 50, 0.95);
@@ -851,7 +1225,6 @@ textarea {
   font-weight: 600;
 }
 
-/* Sponsor Badge */
 .sponsor-inline {
   display: inline-flex;
   align-items: center;
@@ -893,83 +1266,6 @@ textarea {
   filter: brightness(1.2);
 }
 
-/* 📱 Mobile Responsive */
-@media (max-width: 768px) {
-  .footer {
-    padding: 14px 16px 10px;
-  }
-
-  .footer-content {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 12px;
-    padding-bottom: 10px;
-  }
-
-  .footer-left {
-    text-align: center;
-  }
-
-  .footer-logo {
-    justify-content: center;
-    font-size: 0.95rem;
-  }
-
-  .footer-tagline {
-    font-size: 0.7rem;
-  }
-
-  .footer-links {
-    justify-content: center;
-    gap: 16px;
-  }
-
-  .footer-links a {
-    font-size: 0.75rem;
-  }
-
-  .footer-bottom {
-    flex-direction: column;
-    text-align: center;
-    padding-top: 8px;
-    gap: 10px;
-  }
-
-  .footer-bottom p {
-    justify-content: center;
-    font-size: 0.7rem;
-  }
-
-  .sponsor-inline {
-    width: auto;
-    padding: 3px 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  .footer {
-    padding: 12px 16px 8px;
-  }
-
-  .footer-links {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .sponsor-inline {
-    padding: 3px 10px;
-  }
-
-  .sponsor-logo {
-    height: 18px;
-  }
-
-  .sponsor-inline span {
-    font-size: 0.65rem;
-  }
-}
-
 /* ==========================================================================
    Loader Component
    ========================================================================== */
@@ -1009,6 +1305,116 @@ textarea {
     overflow: hidden;
 }
 
+.empty-state {
+    text-align: center;
+    padding: var(--space-3xl) var(--space-lg);
+    color: var(--color-neutral-400);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-lg);
+    opacity: 0.5;
+}
+
+.empty-state-title {
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-neutral-500);
+    margin-bottom: var(--space-sm);
+}
+
+.empty-state-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* ==========================================================================
+   Scrollbar Styling
+   ========================================================================== */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-neutral-200);
+    border-radius: var(--radius-md);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, 
+        var(--color-primary), 
+        var(--color-primary-dark));
+    border-radius: var(--radius-md);
+    border: 2px solid var(--color-neutral-200);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, 
+        var(--color-primary-dark), 
+        var(--color-primary));
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-primary) var(--color-neutral-200);
+}
+
+/* ==========================================================================
+   Selection Styling
+   ========================================================================== */
+::selection {
+    background: rgba(102, 126, 234, 0.3);
+    color: var(--color-secondary);
+}
+
+::-moz-selection {
+    background: rgba(102, 126, 234, 0.3);
+    color: var(--color-secondary);
+}
+
+/* ==========================================================================
+   Enhanced Drag and Drop Feedback
+   ========================================================================== */
+.upload-area.drag-over,
+.checklist-upload-area.drag-over {
+    animation: dragPulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes dragPulse {
+    from {
+        transform: scale(1);
+        border-color: var(--color-primary);
+    }
+    to {
+        transform: scale(1.02);
+        border-color: var(--color-primary-dark);
+    }
+}
+
+.file-item.uploading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.file-item.uploading::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        var(--color-primary), 
+        var(--color-primary-dark));
+    animation: uploadProgress 2s ease-in-out;
+}
+
+@keyframes uploadProgress {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
 /* ==========================================================================
    Responsive Design
    ========================================================================== */
@@ -1026,18 +1432,16 @@ textarea {
 
     .mode-toggle {
         width: 100%;
+        flex-wrap: wrap;
     }
 
     .mode-btn {
         flex: 1;
+        min-width: 120px;
         padding: var(--space-sm) var(--space-md);
     }
 
-    .container {
-        padding: 25px;
-        border-radius: var(--radius-3xl);
-    }
-
+   
     .action-buttons {
         flex-direction: column;
     }
@@ -1062,6 +1466,81 @@ textarea {
     .file-name {
         font-size: 0.9rem;
     }
+
+    .cfc {
+        padding: 1.5rem;
+    }
+
+    .course-meta {
+        grid-template-columns: 1fr;
+    }
+
+    .items > li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .controls {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .sub-items {
+        margin-left: 1rem;
+        padding-left: 1rem;
+    }
+
+    .footer {
+        padding: 14px 16px 10px;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+        padding-bottom: 10px;
+    }
+
+    .footer-left {
+        text-align: center;
+    }
+
+    .footer-logo {
+        justify-content: center;
+        font-size: 0.95rem;
+    }
+
+    .footer-tagline {
+        font-size: 0.7rem;
+    }
+
+    .footer-links {
+        justify-content: center;
+        gap: 16px;
+    }
+
+    .footer-links a {
+        font-size: 0.75rem;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+        padding-top: 8px;
+        gap: 10px;
+    }
+
+    .footer-bottom p {
+        justify-content: center;
+        font-size: 0.7rem;
+    }
+
+    .sponsor-inline {
+        width: auto;
+        padding: 3px 10px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1078,11 +1557,59 @@ textarea {
     }
     
     .footer {
-        padding: var(--space-lg);
+        padding: 12px 16px 8px;
     }
     
     .checklist-controls {
         flex-direction: column;
+    }
+
+    .cfc {
+        padding: 1rem;
+        border-radius: var(--radius-xl);
+    }
+
+    .cfc-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .toggle-btn {
+        font-size: 0.9rem;
+        padding: 0.9rem 1rem;
+    }
+
+    .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+
+    .footer-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .sponsor-inline {
+        padding: 3px 10px;
+    }
+
+    .sponsor-logo {
+        height: 18px;
+    }
+
+    .sponsor-inline span {
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    html {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    html {
+        font-size: 14px;
     }
 }
 
@@ -1107,10 +1634,23 @@ textarea {
         box-shadow: none;
         border: 1px solid #ddd;
     }
+
+    @page {
+        margin: 2cm;
+    }
+    
+    .file-item,
+    .checklist-section {
+        page-break-inside: avoid;
+    }
+    
+    h1, h2, h3 {
+        page-break-after: avoid;
+    }
 }
 
 /* ==========================================================================
-   Reduced Motion Support (Accessibility)
+   Accessibility - Reduced Motion Support
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
     *,
@@ -1124,7 +1664,7 @@ textarea {
 }
 
 /* ==========================================================================
-   High Contrast Mode Support (Accessibility)
+   Accessibility - High Contrast Mode Support
    ========================================================================== */
 @media (prefers-contrast: high) {
     .upload-area,
@@ -1184,477 +1724,5 @@ textarea {
     
     .clear-btn:hover {
         background: #3d3d54;
-    }
-}
-
-/* ==========================================================================
-   Advanced Micro-Interactions
-   ========================================================================== */
-.file-item {
-    position: relative;
-}
-
-.file-item::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 0;
-    background: linear-gradient(90deg, 
-        var(--color-primary), 
-        var(--color-primary-dark));
-    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
-    transition: width var(--transition-base);
-}
-
-.file-item:hover::after {
-    width: 4px;
-}
-
-/* Ripple effect for buttons */
-.action-btn,
-.mode-btn,
-.add-checklist-btn,
-.delete-checklist-btn {
-    position: relative;
-    overflow: hidden;
-}
-
-.action-btn::after,
-.mode-btn::after,
-.add-checklist-btn::after,
-.delete-checklist-btn::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: var(--radius-round);
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.action-btn:active::after,
-.mode-btn:active::after,
-.add-checklist-btn:active::after,
-.delete-checklist-btn:active::after {
-    width: 300px;
-    height: 300px;
-}
-
-/* Pulse animation for processing state */
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    50% {
-        opacity: 0.8;
-        transform: scale(1.02);
-    }
-}
-
-.status-message.processing {
-    animation: pulse 2s ease-in-out infinite;
-}
-
-/* Smooth skeleton loading effect */
-@keyframes shimmer {
-    0% {
-        background-position: -1000px 0;
-    }
-    100% {
-        background-position: 1000px 0;
-    }
-}
-
-.loading-skeleton {
-    background: linear-gradient(
-        90deg,
-        var(--color-neutral-200) 0%,
-        var(--color-neutral-300) 50%,
-        var(--color-neutral-200) 100%
-    );
-    background-size: 1000px 100%;
-    animation: shimmer 2s infinite;
-    border-radius: var(--radius-md);
-}
-
-/* ==========================================================================
-   Enhanced Drag and Drop Feedback
-   ========================================================================== */
-.upload-area.drag-over,
-.checklist-upload-area.drag-over {
-    animation: dragPulse 0.5s ease-in-out infinite alternate;
-}
-
-@keyframes dragPulse {
-    from {
-        transform: scale(1);
-        border-color: var(--color-primary);
-    }
-    to {
-        transform: scale(1.02);
-        border-color: var(--color-primary-dark);
-    }
-}
-
-/* File upload progress indicator */
-.file-item.uploading {
-    opacity: 0.6;
-    pointer-events: none;
-}
-
-.file-item.uploading::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: 3px;
-    background: linear-gradient(90deg, 
-        var(--color-primary), 
-        var(--color-primary-dark));
-    animation: uploadProgress 2s ease-in-out;
-}
-
-@keyframes uploadProgress {
-    from { width: 0; }
-    to { width: 100%; }
-}
-
-/* ==========================================================================
-   Tooltip Component (Optional Enhancement)
-   ========================================================================== */
-[data-tooltip] {
-    position: relative;
-}
-
-[data-tooltip]::before {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%) translateY(-5px);
-    padding: 8px 12px;
-    background: rgba(26, 26, 46, 0.95);
-    color: var(--color-white);
-    font-size: 0.85rem;
-    font-weight: var(--font-weight-medium);
-    border-radius: var(--radius-sm);
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: all var(--transition-base);
-    z-index: var(--z-tooltip);
-    box-shadow: var(--shadow-lg);
-}
-
-[data-tooltip]::after {
-    content: '';
-    position: absolute;
-    bottom: calc(100% + 2px);
-    left: 50%;
-    transform: translateX(-50%);
-    border: 6px solid transparent;
-    border-top-color: rgba(26, 26, 46, 0.95);
-    opacity: 0;
-    pointer-events: none;
-    transition: all var(--transition-base);
-    z-index: var(--z-tooltip);
-}
-
-[data-tooltip]:hover::before,
-[data-tooltip]:hover::after {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-
-/* ==========================================================================
-   Empty State Styles
-   ========================================================================== */
-.empty-state {
-    text-align: center;
-    padding: var(--space-3xl) var(--space-lg);
-    color: var(--color-neutral-400);
-}
-
-.empty-state-icon {
-    font-size: 4rem;
-    margin-bottom: var(--space-lg);
-    opacity: 0.5;
-}
-
-.empty-state-title {
-    font-size: 1.25rem;
-    font-weight: var(--font-weight-bold);
-    color: var(--color-neutral-500);
-    margin-bottom: var(--space-sm);
-}
-
-.empty-state-description {
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
-
-/* ==========================================================================
-   Success Animation
-   ========================================================================== */
-@keyframes successCheckmark {
-    0% {
-        transform: scale(0) rotate(0deg);
-        opacity: 0;
-    }
-    50% {
-        transform: scale(1.2) rotate(180deg);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1) rotate(360deg);
-        opacity: 1;
-    }
-}
-
-.status-message.success::before {
-    content: '✓';
-    display: inline-block;
-    animation: successCheckmark 0.6s ease;
-}
-
-/* ==========================================================================
-   Badge Component
-   ========================================================================== */
-.badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: var(--font-weight-bold);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.badge.badge-primary {
-    background: linear-gradient(135deg, 
-        rgba(102, 126, 234, 0.15), 
-        rgba(118, 75, 162, 0.15));
-    color: var(--color-primary-dark);
-}
-
-.badge.badge-success {
-    background: rgba(39, 174, 96, 0.15);
-    color: var(--color-success);
-}
-
-.badge.badge-warning {
-    background: rgba(230, 126, 34, 0.15);
-    color: var(--color-warning);
-}
-
-.badge.badge-error {
-    background: rgba(255, 107, 107, 0.15);
-    color: var(--color-error);
-}
-
-/* ==========================================================================
-   Scrollbar Styling
-   ========================================================================== */
-::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--color-neutral-200);
-    border-radius: var(--radius-md);
-}
-
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, 
-        var(--color-primary), 
-        var(--color-primary-dark));
-    border-radius: var(--radius-md);
-    border: 2px solid var(--color-neutral-200);
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, 
-        var(--color-primary-dark), 
-        var(--color-primary));
-}
-
-/* Firefox scrollbar */
-* {
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-primary) var(--color-neutral-200);
-}
-
-/* ==========================================================================
-   Selection Styling
-   ========================================================================== */
-::selection {
-    background: rgba(102, 126, 234, 0.3);
-    color: var(--color-secondary);
-}
-
-::-moz-selection {
-    background: rgba(102, 126, 234, 0.3);
-    color: var(--color-secondary);
-}
-
-/* ==========================================================================
-   Floating Action Button (Optional Enhancement)
-   ========================================================================== */
-.fab {
-    position: fixed;
-    bottom: var(--space-xl);
-    right: var(--space-xl);
-    width: 60px;
-    height: 60px;
-    border-radius: var(--radius-round);
-    background: linear-gradient(135deg, 
-        var(--color-primary), 
-        var(--color-primary-dark));
-    color: var(--color-white);
-    border: none;
-    box-shadow: var(--shadow-lg);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    transition: all var(--transition-base);
-    z-index: var(--z-dropdown);
-}
-
-.fab:hover {
-    transform: scale(1.1) rotate(90deg);
-    box-shadow: var(--shadow-xl);
-}
-
-.fab:active {
-    transform: scale(0.95) rotate(90deg);
-}
-
-/* ==========================================================================
-   Progress Bar Component
-   ========================================================================== */
-.progress-bar {
-    width: 100%;
-    height: 6px;
-    background: var(--color-neutral-200);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    margin-top: var(--space-sm);
-}
-
-.progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, 
-        var(--color-primary), 
-        var(--color-primary-dark));
-    border-radius: var(--radius-md);
-    transition: width var(--transition-base);
-    position: relative;
-}
-
-.progress-bar-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg,
-        transparent,
-        rgba(255, 255, 255, 0.3),
-        transparent
-    );
-    animation: progressShine 1.5s infinite;
-}
-
-@keyframes progressShine {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-}
-
-/* ==========================================================================
-   Card Hover Effects
-   ========================================================================== */
-.container {
-    transition: all var(--transition-base);
-}
-
-.container:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 50px 120px rgba(0, 0, 0, 0.6);
-}
-
-/* ==========================================================================
-   Input Enhancement
-   ========================================================================== */
-input[type="file"] {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-/* ==========================================================================
-   Responsive Typography
-   ========================================================================== */
-@media (max-width: 1024px) {
-    html {
-        font-size: 15px;
-    }
-}
-
-@media (max-width: 768px) {
-    html {
-        font-size: 14px;
-    }
-}
-
-/* ==========================================================================
-   Performance Optimizations
-   ========================================================================== */
-.container,
-.file-item,
-.checklist-section,
-.upload-area,
-.mode-btn {
-    will-change: transform;
-}
-
-/* Optimize animations */
-@media (prefers-reduced-motion: no-preference) {
-    .smooth-animation {
-        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    }
-}
-
-/* ==========================================================================
-   Print-Friendly Enhancements
-   ========================================================================== */
-@media print {
-    @page {
-        margin: 2cm;
-    }
-    
-    .file-item,
-    .checklist-section {
-        page-break-inside: avoid;
-    }
-    
-    h1, h2, h3 {
-        page-break-after: avoid;
     }
 }
