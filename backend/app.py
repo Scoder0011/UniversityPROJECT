@@ -1,4 +1,3 @@
-
 from flask import Flask, request, send_file
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
@@ -6,6 +5,9 @@ import os
 import tempfile
 from pathlib import Path
 from datetime import datetime
+import json
+import time
+import subprocess
 
 # Document processing libraries
 from docx import Document
@@ -27,9 +29,6 @@ import io
 app = Flask(__name__)
 CORS(app)
 
-
-
-
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'doc', 'pptx', 'ppt', 'txt', 'jpg', 'jpeg', 'png', 'gif'}
 TEMP_DIR = tempfile.gettempdir()
 
@@ -50,8 +49,75 @@ def get_file_type(filename):
         return 'image'
     return 'unknown'
 
-# CONVERTERS TO INTERMEDIATE FORMAT
+# HELPER FUNCTIONS FOR UNIDOC
+def create_cover_page(output_path):
+    """Create cover page for UniDoc"""
+    c = canvas.Canvas(output_path, pagesize=letter)
+    width, height = letter
+    c.setFont("Helvetica-Bold", 36)
+    c.drawCentredString(width/2, height - 2*inch, "Course File")
+    c.setFont("Helvetica-Bold", 24)
+    c.drawCentredString(width/2, height - 3*inch, "Documentation")
+    c.setFont("Helvetica", 12)
+    c.drawCentredString(width/2, height - 4*inch, f"Generated: {datetime.now().strftime('%B %d, %Y')}")
+    c.showPage()
+    c.save()
 
+def create_course_info_page(course_data, output_path):
+    """Create course information page"""
+    c = canvas.Canvas(output_path, pagesize=letter)
+    width, height = letter
+    c.setFont("Helvetica-Bold", 20)
+    c.drawString(72, height - 1.5*inch, "Course Information")
+    c.setFont("Helvetica-Bold", 12)
+    y = height - 2.5*inch
+    fields = [
+        ('Program & Semester', course_data.get('program', 'N/A')),
+        ('Course Code', course_data.get('code', 'N/A')),
+        ('Course Name', course_data.get('name', 'N/A')),
+        ('Course Coordinator', course_data.get('coordinator', 'N/A')),
+        ('Theory Faculty', course_data.get('faculty', 'N/A')),
+        ('LTPC', course_data.get('ltpc', 'N/A'))
+    ]
+    for label, value in fields:
+        c.setFont("Helvetica-Bold", 11)
+        c.drawString(72, y, f"{label}:")
+        c.setFont("Helvetica", 11)
+        c.drawString(72, y - 15, str(value))
+        y -= 40
+    c.showPage()
+    c.save()
+
+def create_index_page(file_names, output_path):
+    """Create index page"""
+    c = canvas.Canvas(output_path, pagesize=letter)
+    width, height = letter
+    c.setFont("Helvetica-Bold", 20)
+    c.drawString(72, height - 1.5*inch, "Table of Contents")
+    c.setFont("Helvetica", 11)
+    y = height - 2.5*inch
+    for i, name in enumerate(file_names, 1):
+        if y < 100:
+            c.showPage()
+            y = height - inch
+        c.drawString(72, y, f"{i}. {name}")
+        y -= 25
+    c.showPage()
+    c.save()
+
+def create_divider_pdf(title, output_path):
+    """Create a one-page divider PDF with title and timestamp."""
+    c = canvas.Canvas(output_path, pagesize=letter)
+    width, height = letter
+    c.setFont("Helvetica-Bold", 26)
+    c.drawCentredString(width / 2, height - 2 * inch, title)
+    c.setFont("Helvetica", 10)
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    c.drawCentredString(width / 2, height - 2 * inch - 20, f"Generated: {timestamp}")
+    c.showPage()
+    c.save()
+
+# CONVERTERS TO INTERMEDIATE FORMAT
 def docx_to_text_with_formatting(docx_path):
     """Extract text with basic formatting info from DOCX"""
     doc = Document(docx_path)
@@ -124,79 +190,18 @@ def text_to_pdf(text, output_pdf):
     doc.build(story)
 
 def docx_to_pdf(docx_path, output_pdf):
-    """STRICT: Convert DOCX to PDF using LibreOffice only. Fail if not available."""
-    import subprocess
-    def create_cover_page(output_path):
-    """Create cover page for UniDoc"""
-    c = canvas.Canvas(output_path, pagesize=letter)
-    width, height = letter
-    c.setFont("Helvetica-Bold", 36)
-    c.drawCentredString(width/2, height - 2*inch, "Course File")
-    c.setFont("Helvetica-Bold", 24)
-    c.drawCentredString(width/2, height - 3*inch, "Documentation")
-    c.setFont("Helvetica", 12)
-    c.drawCentredString(width/2, height - 4*inch, f"Generated: {datetime.now().strftime('%B %d, %Y')}")
-    c.showPage()
-    c.save()
-
-def create_course_info_page(course_data, output_path):
-    """Create course information page"""
-    c = canvas.Canvas(output_path, pagesize=letter)
-    width, height = letter
-    c.setFont("Helvetica-Bold", 20)
-    c.drawString(72, height - 1.5*inch, "Course Information")
-    c.setFont("Helvetica-Bold", 12)
-    y = height - 2.5*inch
-    fields = [
-        ('Program & Semester', course_data.get('program', 'N/A')),
-        ('Course Code', course_data.get('code', 'N/A')),
-        ('Course Name', course_data.get('name', 'N/A')),
-        ('Course Coordinator', course_data.get('coordinator', 'N/A')),
-        ('Theory Faculty', course_data.get('faculty', 'N/A')),
-        ('LTPC', course_data.get('ltpc', 'N/A'))
-    ]
-    for label, value in fields:
-        c.setFont("Helvetica-Bold", 11)
-        c.drawString(72, y, f"{label}:")
-        c.setFont("Helvetica", 11)
-        c.drawString(72, y - 15, str(value))
-        y -= 40
-    c.showPage()
-    c.save()
-
-def create_index_page(file_names, output_path):
-    """Create index page"""
-    c = canvas.Canvas(output_path, pagesize=letter)
-    width, height = letter
-    c.setFont("Helvetica-Bold", 20)
-    c.drawString(72, height - 1.5*inch, "Table of Contents")
-    c.setFont("Helvetica", 11)
-    y = height - 2.5*inch
-    for i, name in enumerate(file_names, 1):
-        if y < 100:
-            c.showPage()
-            y = height - inch
-        c.drawString(72, y, f"{i}. {name}")
-        y -= 25
-    c.showPage()
-    c.save()
-
-    # Possible LibreOffice commands
+    """Convert DOCX to PDF - try LibreOffice first, fallback to manual"""
     libreoffice_commands = [
-        'libreoffice',  # Linux
-        'soffice',      # Alternative Linux
-        '/Applications/LibreOffice.app/Contents/MacOS/soffice',  # macOS
-        'C:\\Program Files\\LibreOffice\\program\\soffice.exe',  # Windows
+        'libreoffice', 'soffice',
+        '/Applications/LibreOffice.app/Contents/MacOS/soffice',
+        'C:\\Program Files\\LibreOffice\\program\\soffice.exe',
         'C:\\Program Files (x86)\\LibreOffice\\program\\soffice.exe'
     ]
 
     libreoffice_path = None
     for cmd in libreoffice_commands:
         try:
-            result = subprocess.run([cmd, '--version'],
-                                    capture_output=True,
-                                    timeout=5,
-                                    text=True)
+            result = subprocess.run([cmd, '--version'], capture_output=True, timeout=5, text=True)
             if result.returncode == 0:
                 libreoffice_path = cmd
                 print(f"✅ Found LibreOffice: {cmd}")
@@ -204,40 +209,40 @@ def create_index_page(file_names, output_path):
         except Exception:
             continue
 
-    if not libreoffice_path:
-        raise RuntimeError("❌ LibreOffice not found on server. Please install LibreOffice.")
+    # Try LibreOffice if available
+    if libreoffice_path:
+        try:
+            output_dir = os.path.dirname(output_pdf)
+            subprocess.run([
+                libreoffice_path, '--headless', '--nologo',
+                '--nofirststartwizard', '--norestore',
+                '--convert-to', 'pdf', '--outdir', output_dir, docx_path
+            ], capture_output=True, timeout=60)
 
+            base_name = os.path.splitext(os.path.basename(docx_path))[0]
+            temp_pdf = os.path.join(output_dir, f"{base_name}.pdf")
+
+            if os.path.exists(temp_pdf):
+                os.rename(temp_pdf, output_pdf)
+                print(f"✅ LibreOffice conversion SUCCESS: {os.path.basename(docx_path)}")
+                return
+        except Exception as e:
+            print(f"⚠️ LibreOffice failed, trying manual conversion: {e}")
+
+    # Manual fallback conversion
+    print(f"⚠️ Using manual DOCX conversion for: {os.path.basename(docx_path)}")
     try:
-        output_dir = os.path.dirname(output_pdf)
-        result = subprocess.run(
-            [
-                libreoffice_path,
-                '--headless',
-                '--nologo',
-                '--nofirststartwizard',
-                '--norestore',
-                '--convert-to', 'pdf',
-                '--outdir', output_dir,
-                docx_path
-            ],
-            capture_output=True,
-            timeout=60
-        )
-
-        base_name = os.path.splitext(os.path.basename(docx_path))[0]
-        temp_pdf = os.path.join(output_dir, f"{base_name}.pdf")
-
-        if os.path.exists(temp_pdf):
-            os.rename(temp_pdf, output_pdf)
-            print(f"✅ LibreOffice conversion SUCCESS: {os.path.basename(docx_path)}")
-            return
-        else:
-            raise RuntimeError(f"❌ LibreOffice did not produce output for {os.path.basename(docx_path)}")
-
-    except Exception as e:
-        raise RuntimeError(f"❌ LibreOffice conversion failed: {e}")
-
-        # Process tables with better formatting
+        doc = SimpleDocTemplate(output_pdf, pagesize=letter)
+        story = []
+        styles = getSampleStyleSheet()
+        source_doc = Document(docx_path)
+        
+        for para in source_doc.paragraphs:
+            if para.text.strip():
+                story.append(Paragraph(para.text, styles['Normal']))
+                story.append(Spacer(1, 0.1 * inch))
+        
+        # Process tables
         for table in source_doc.tables:
             table_data = []
             for row in table.rows:
@@ -245,53 +250,22 @@ def create_index_page(file_names, output_path):
                 table_data.append(row_data)
             
             if table_data:
-                # Create reportlab table
                 t = Table(table_data)
                 t.setStyle(TableStyle([
                     ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
                     ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.black),
                     ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                     ('FONTSIZE', (0, 0), (-1, 0), 12),
-                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                    ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-                    ('FONTSIZE', (0, 1), (-1, -1), 10),
-                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                 ]))
                 story.append(Spacer(1, 0.2 * inch))
                 story.append(t)
                 story.append(Spacer(1, 0.2 * inch))
         
-        # Extract all images from document
-        for rel in source_doc.part.rels.values():
-            if "image" in rel.target_ref:
-                try:
-                    image_data = rel.target_part.blob
-                    img = Image.open(io.BytesIO(image_data))
-                    
-                    # Resize if needed
-                    max_width = 6 * inch
-                    max_height = 8 * inch
-                    img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
-                    
-                    img_buffer = io.BytesIO()
-                    img.save(img_buffer, format='PNG')
-                    img_buffer.seek(0)
-                    
-                    story.append(Spacer(1, 0.2 * inch))
-                    story.append(RLImage(img_buffer, width=img.size[0], height=img.size[1]))
-                    story.append(Spacer(1, 0.2 * inch))
-                except Exception as e:
-                    print(f"Error processing image: {e}")
-        
         doc.build(story)
-        print(f"✓ Manual conversion successful: {os.path.basename(docx_path)}")
-        
+        print(f"✅ Manual conversion successful: {os.path.basename(docx_path)}")
     except Exception as e:
-        print(f"✗ Manual DOCX conversion failed: {e}")
+        print(f"❌ Manual DOCX conversion failed: {e}")
         raise
 
 def pptx_to_pdf(pptx_path, output_pdf):
@@ -306,30 +280,26 @@ def pptx_to_pdf(pptx_path, output_pdf):
         fontSize=16,
         textColor='#2c3e50',
         spaceAfter=12,
-        alignment=1  # Center
+        alignment=1
     )
     
     prs = Presentation(pptx_path)
     
     for slide_num, slide in enumerate(prs.slides, 1):
-        # Slide number
         story.append(Paragraph(f"Slide {slide_num}", slide_title_style))
         story.append(Spacer(1, 0.2 * inch))
         
-        # Extract text from shapes
         for shape in slide.shapes:
             if hasattr(shape, "text") and shape.text.strip():
                 story.append(Paragraph(shape.text, styles['Normal']))
                 story.append(Spacer(1, 0.1 * inch))
         
-        # Page break between slides
         if slide_num < len(prs.slides):
             story.append(PageBreak())
     
     doc.build(story)
 
 # COMBINERS FOR DIFFERENT OUTPUT FORMATS
-
 def combine_to_pdf(files, output_path):
     """Combine all files into a PDF - PRESERVING ORIGINAL PDF FORMATTING"""
     merger = PdfMerger()
@@ -342,11 +312,8 @@ def combine_to_pdf(files, output_path):
             filename = file_info['name']
             
             if file_type == 'pdf':
-                # For PDFs, merge directly without conversion to preserve formatting
                 merger.append(file_path)
-            
             else:
-                # For non-PDF files, convert to PDF first
                 temp_pdf = os.path.join(TEMP_DIR, f"temp_{idx}_{datetime.now().timestamp()}.pdf")
                 temp_pdfs.append(temp_pdf)
                 
@@ -361,12 +328,10 @@ def combine_to_pdf(files, output_path):
                     elif file_type == 'pptx':
                         pptx_to_pdf(file_path, temp_pdf)
                     
-                    # Append the converted PDF
                     merger.append(temp_pdf)
                 
                 except Exception as e:
                     print(f"Error converting {filename}: {e}")
-                    # Create error page
                     error_pdf = os.path.join(TEMP_DIR, f"error_{idx}.pdf")
                     temp_pdfs.append(error_pdf)
                     c = canvas.Canvas(error_pdf, pagesize=letter)
@@ -376,12 +341,10 @@ def combine_to_pdf(files, output_path):
                     c.save()
                     merger.append(error_pdf)
         
-        # Write the merged PDF
         merger.write(output_path)
         merger.close()
     
     finally:
-        # Cleanup temporary PDFs
         for temp_pdf in temp_pdfs:
             try:
                 if os.path.exists(temp_pdf):
@@ -393,7 +356,6 @@ def combine_to_docx(files, output_path):
     """Combine all files into a DOCX"""
     doc = Document()
     
-    # Add title
     title = doc.add_heading('Combined Document', 0)
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     
@@ -402,7 +364,6 @@ def combine_to_docx(files, output_path):
         file_type = file_info['type']
         filename = file_info['name']
         
-        # Add file header
         heading = doc.add_heading(f'File {idx + 1}: {filename}', level=1)
         heading_para = heading.runs[0]
         heading_para.font.color.rgb = RGBColor(102, 126, 234)
@@ -414,7 +375,6 @@ def combine_to_docx(files, output_path):
                     doc.add_heading(f'Page {page_num + 1}', level=2)
                     text = page.extract_text()
                     if text.strip():
-                        # Preserve line breaks
                         for para in text.split('\n'):
                             if para.strip():
                                 doc.add_paragraph(para)
@@ -422,17 +382,13 @@ def combine_to_docx(files, output_path):
             elif file_type == 'docx':
                 source_doc = Document(file_path)
                 
-                # Copy paragraphs
                 for para in source_doc.paragraphs:
                     if para.text.strip():
                         new_para = doc.add_paragraph(para.text)
-                        # Try to preserve some formatting
                         if para.style.name.startswith('Heading'):
                             new_para.style = para.style.name
                 
-                # Copy tables
                 for table in source_doc.tables:
-                    # Create new table
                     new_table = doc.add_table(rows=len(table.rows), cols=len(table.columns))
                     new_table.style = 'Light Grid Accent 1'
                     
@@ -456,13 +412,12 @@ def combine_to_docx(files, output_path):
             elif file_type == 'image':
                 try:
                     doc.add_picture(file_path, width=Inches(6))
-                except Exception as e:
+                except Exception:
                     doc.add_paragraph(f'[Image: {filename}]')
         
         except Exception as e:
             doc.add_paragraph(f'Error processing this file: {str(e)}')
         
-        # Add page break between files
         if idx < len(files) - 1:
             doc.add_page_break()
     
@@ -474,7 +429,6 @@ def combine_to_pptx(files, output_path):
     prs.slide_width = PptxInches(10)
     prs.slide_height = PptxInches(7.5)
     
-    # Title slide
     title_slide_layout = prs.slide_layouts[0]
     slide = prs.slides.add_slide(title_slide_layout)
     title = slide.shapes.title
@@ -487,7 +441,6 @@ def combine_to_pptx(files, output_path):
         file_type = file_info['type']
         filename = file_info['name']
         
-        # Add section slide
         bullet_slide_layout = prs.slide_layouts[1]
         slide = prs.slides.add_slide(bullet_slide_layout)
         title = slide.shapes.title
@@ -510,7 +463,7 @@ def combine_to_pptx(files, output_path):
                     
                     text = page.extract_text()
                     if text.strip():
-                        tf.text += text[:2000]  # Increased limit
+                        tf.text += text[:2000]
             
             elif file_type == 'docx':
                 content = docx_to_text_with_formatting(file_path)
@@ -533,12 +486,9 @@ def combine_to_pptx(files, output_path):
             
             elif file_type == 'pptx':
                 source_prs = Presentation(file_path)
-                # Copy slides directly
                 for source_slide in source_prs.slides:
-                    # Create new slide
-                    slide = prs.slides.add_slide(prs.slide_layouts[6])  # Blank
+                    slide = prs.slides.add_slide(prs.slide_layouts[6])
                     
-                    # Copy shapes
                     for shape in source_slide.shapes:
                         if hasattr(shape, "text") and shape.text:
                             left = PptxInches(0.5)
@@ -597,6 +547,7 @@ def combine_to_pptx(files, output_path):
     
     prs.save(output_path)
 
+# ROUTES
 @app.route('/combine', methods=['POST'])
 def combine_files():
     """Main endpoint to combine files"""
@@ -609,12 +560,10 @@ def combine_files():
     if not files or files[0].filename == '':
         return {'error': 'No files selected'}, 400
     
-    # Validate files
     for file in files:
         if not allowed_file(file.filename):
             return {'error': f'File type not allowed: {file.filename}'}, 400
     
-    # Save uploaded files temporarily
     temp_files = []
     output_path = None
     
@@ -630,11 +579,9 @@ def combine_files():
                 'type': get_file_type(filename)
             })
         
-        # Create output file
         output_filename = f'combined_{datetime.now().strftime("%Y%m%d_%H%M%S")}.{output_format}'
         output_path = os.path.join(TEMP_DIR, output_filename)
         
-        # Combine based on output format
         if output_format == 'pdf':
             combine_to_pdf(temp_files, output_path)
         elif output_format == 'docx':
@@ -644,7 +591,6 @@ def combine_files():
         else:
             return {'error': 'Invalid output format'}, 400
         
-        # Send file
         response = send_file(
             output_path,
             as_attachment=True,
@@ -661,37 +607,16 @@ def combine_files():
         return {'error': str(e), 'details': error_details}, 500
     
     finally:
-        # Cleanup temporary files
         for file_info in temp_files:
             try:
                 if os.path.exists(file_info['path']):
                     os.remove(file_info['path'])
             except:
-                pass 
-import json
-import time
-from PyPDF2 import PdfMerger
-from reportlab.pdfgen import canvas
-
-def create_divider_pdf(title, output_path):
-    """Create a one-page divider PDF with title and timestamp."""
-    c = canvas.Canvas(output_path, pagesize=letter)
-    width, height = letter
-    c.setFont("Helvetica-Bold", 26)
-    c.drawCentredString(width / 2, height - 2 * inch, title)
-    c.setFont("Helvetica", 10)
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    c.drawCentredString(width / 2, height - 2 * inch - 20, f"Generated: {timestamp}")
-    c.showPage()
-    c.save()
+                pass
 
 @app.route('/combine-checklist', methods=['POST'])
 def combine_checklist():
-    """
-    Expect form-data:
-      - 'checklist_data': JSON array [{name: "...", files: ["checklist_0_file_0", ...]}, ...]
-      - files uploaded under keys referenced in checklist_data
-    """
+    """Combine files with checklist dividers"""
     if 'checklist_data' not in request.form:
         return {'error': 'Missing checklist_data'}, 400
 
@@ -701,24 +626,20 @@ def combine_checklist():
         return {'error': 'Invalid checklist_data JSON', 'details': str(e)}, 400
 
     merger = PdfMerger()
-    temp_to_cleanup = []       # raw uploads + divider PDFs + converted PDFs
+    temp_to_cleanup = []
 
     try:
-        # Build ordered list and append to merger as we go
         for sec_idx, checklist in enumerate(checklist_data):
             section_name = checklist.get('name') or f"Section {sec_idx+1}"
 
-            # 1) Divider page
             divider_fp = os.path.join(TEMP_DIR, f"divider_{int(time.time()*1000)}_{sec_idx}.pdf")
             create_divider_pdf(section_name, divider_fp)
             temp_to_cleanup.append(divider_fp)
             merger.append(divider_fp)
 
-            # 2) Process files for this section in the provided order
             for file_key in checklist.get('files', []):
                 if file_key not in request.files:
                     print(f"Warning: missing file key {file_key}")
-                    # Insert a warning page so order is preserved
                     warn_fp = os.path.join(TEMP_DIR, f"warn_{int(time.time()*1000)}.pdf")
                     c = canvas.Canvas(warn_fp, pagesize=letter)
                     c.setFont("Helvetica", 12)
@@ -730,11 +651,9 @@ def combine_checklist():
 
                 fs = request.files[file_key]
                 if fs.filename == '':
-                    # skip empty
                     continue
 
                 if not allowed_file(fs.filename):
-                    # create error page and append
                     err_fp = os.path.join(TEMP_DIR, f"not_allowed_{int(time.time()*1000)}.pdf")
                     c = canvas.Canvas(err_fp, pagesize=letter)
                     c.setFont("Helvetica", 12)
@@ -744,44 +663,36 @@ def combine_checklist():
                     merger.append(err_fp)
                     continue
 
-                # Save original uploaded file
                 safe_name = secure_filename(fs.filename)
                 saved_raw = os.path.join(TEMP_DIR, f"{int(time.time()*1000)}_{safe_name}")
                 fs.save(saved_raw)
                 temp_to_cleanup.append(saved_raw)
 
-                # Determine type and convert if needed
                 ftype = get_file_type(safe_name)
                 try:
                     if ftype == 'pdf':
                         merger.append(saved_raw)
                     else:
-                        # create a temp pdf path to hold converted result
                         converted_pdf = os.path.join(TEMP_DIR, f"converted_{int(time.time()*1000)}.pdf")
-                        # Route to appropriate converter (these functions exist in your app)
                         if ftype == 'image':
                             image_to_pdf(saved_raw, converted_pdf)
                         elif ftype == 'txt':
                             text = txt_to_text(saved_raw)
                             text_to_pdf(text, converted_pdf)
                         elif ftype == 'docx':
-                            # try using your docx_to_pdf which prefers LibreOffice, fallback exists
                             docx_to_pdf(saved_raw, converted_pdf)
                         elif ftype == 'pptx':
                             pptx_to_pdf(saved_raw, converted_pdf)
                         else:
-                            # unknown types -> create placeholder PDF
                             c = canvas.Canvas(converted_pdf, pagesize=letter)
                             c.setFont("Helvetica", 12)
                             c.drawString(60, 750, f"[{safe_name}] - unsupported type, could not convert.")
                             c.save()
 
-                        # Append converted PDF
                         temp_to_cleanup.append(converted_pdf)
                         merger.append(converted_pdf)
 
                 except Exception as conv_err:
-                    # Conversion failed — insert an error page to preserve order
                     error_pdf = os.path.join(TEMP_DIR, f"conv_error_{int(time.time()*1000)}.pdf")
                     c = canvas.Canvas(error_pdf, pagesize=letter)
                     c.setFont("Helvetica", 12)
@@ -792,7 +703,6 @@ def combine_checklist():
                     merger.append(error_pdf)
                     print(f"Conversion error for {safe_name}:", conv_err)
 
-        # Write merged output
         output_filename = f'checklist_combined_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
         output_path = os.path.join(TEMP_DIR, output_filename)
         merger.write(output_path)
@@ -811,20 +721,21 @@ def combine_checklist():
         return {'error': str(e)}, 500
 
     finally:
-        # cleanup raw files, converters, dividers (NOT the final output which we returned already)
         for p in temp_to_cleanup:
             try:
                 if os.path.exists(p):
                     os.remove(p)
             except Exception:
                 pass
+
 @app.route('/combine-unidoc', methods=['POST'])
 def combine_unidoc():
+    """Combine files with UniDoc format - cover page, course info, index, then files"""
     files = request.files.getlist("files")
     if not files:
         return {'error': 'No files uploaded'}, 400
 
-    # Collect form fields
+    # Collect course metadata from form
     course_data = {
         'program': request.form.get('program', ''),
         'code': request.form.get('code', ''),
@@ -839,50 +750,96 @@ def combine_unidoc():
 
     try:
         # Generate the 3 front pages
-        cover_fp = os.path.join(TEMP_DIR, "cover.pdf")
-        info_fp = os.path.join(TEMP_DIR, "course_info.pdf")
-        index_fp = os.path.join(TEMP_DIR, "index.pdf")
+        cover_fp = os.path.join(TEMP_DIR, f"cover_{int(time.time()*1000)}.pdf")
+        info_fp = os.path.join(TEMP_DIR, f"course_info_{int(time.time()*1000)}.pdf")
+        index_fp = os.path.join(TEMP_DIR, f"index_{int(time.time()*1000)}.pdf")
+        
         create_cover_page(cover_fp)
         create_course_info_page(course_data, info_fp)
-        create_index_page([f.filename.split('.')[0] for f in files], index_fp)
+        
+        # Create index with file names (without extension)
+        file_names = [f.filename.rsplit('.', 1)[0] if '.' in f.filename else f.filename for f in files]
+        create_index_page(file_names, index_fp)
 
+        # Append front pages
         for fp in [cover_fp, info_fp, index_fp]:
             merger.append(fp)
             temp_files.append(fp)
 
-        # Process uploaded files (like combine_to_pdf logic)
+        # Process uploaded files
         for file in files:
-            if file.filename == '': continue
+            if file.filename == '':
+                continue
+                
             filename = secure_filename(file.filename)
             temp_path = os.path.join(TEMP_DIR, f"{datetime.now().timestamp()}_{filename}")
             file.save(temp_path)
-            file_type = get_file_type(filename)
-            if file_type == 'pdf':
-                merger.append(temp_path)
-            else:
-                converted_pdf = temp_path + ".pdf"
-                if file_type == 'image':
-                    image_to_pdf(temp_path, converted_pdf)
-                elif file_type == 'txt':
-                    text_to_pdf(txt_to_text(temp_path), converted_pdf)
-                elif file_type == 'docx':
-                    docx_to_pdf(temp_path, converted_pdf)
-                elif file_type == 'pptx':
-                    pptx_to_pdf(temp_path, converted_pdf)
-                merger.append(converted_pdf)
-                temp_files.append(converted_pdf)
             temp_files.append(temp_path)
+            
+            file_type = get_file_type(filename)
+            
+            try:
+                if file_type == 'pdf':
+                    merger.append(temp_path)
+                else:
+                    converted_pdf = os.path.join(TEMP_DIR, f"converted_{int(time.time()*1000)}.pdf")
+                    
+                    if file_type == 'image':
+                        image_to_pdf(temp_path, converted_pdf)
+                    elif file_type == 'txt':
+                        text_to_pdf(txt_to_text(temp_path), converted_pdf)
+                    elif file_type == 'docx':
+                        docx_to_pdf(temp_path, converted_pdf)
+                    elif file_type == 'pptx':
+                        pptx_to_pdf(temp_path, converted_pdf)
+                    else:
+                        # Unknown type - create placeholder
+                        c = canvas.Canvas(converted_pdf, pagesize=letter)
+                        c.setFont("Helvetica", 12)
+                        c.drawString(60, 750, f"File: {filename}")
+                        c.drawString(60, 730, f"Unsupported file type")
+                        c.save()
+                    
+                    merger.append(converted_pdf)
+                    temp_files.append(converted_pdf)
+                    
+            except Exception as e:
+                # Create error page for this file
+                error_pdf = os.path.join(TEMP_DIR, f"error_{int(time.time()*1000)}.pdf")
+                c = canvas.Canvas(error_pdf, pagesize=letter)
+                c.setFont("Helvetica", 12)
+                c.drawString(60, 750, f"Error processing file: {filename}")
+                c.drawString(60, 730, f"Error: {str(e)}")
+                c.save()
+                merger.append(error_pdf)
+                temp_files.append(error_pdf)
+                print(f"Error processing {filename}: {e}")
 
-        output_path = os.path.join(TEMP_DIR, f"unidoc_combined_{datetime.now().timestamp()}.pdf")
+        # Write final output
+        output_filename = f"unidoc_combined_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        output_path = os.path.join(TEMP_DIR, output_filename)
         merger.write(output_path)
         merger.close()
-        return send_file(output_path, as_attachment=True, download_name="unidoc_combined.pdf")
+        
+        return send_file(
+            output_path,
+            as_attachment=True,
+            download_name=output_filename,
+            mimetype='application/pdf'
+        )
+
+    except Exception as e:
+        import traceback
+        print("ERROR in /combine-unidoc:", traceback.format_exc())
+        return {'error': str(e), 'details': traceback.format_exc()}, 500
 
     finally:
         for p in temp_files:
-            try: os.remove(p)
-            except: pass
-
+            try:
+                if os.path.exists(p):
+                    os.remove(p)
+            except:
+                pass
 
 @app.route('/health', methods=['GET'])
 def health_check():
@@ -897,6 +854,8 @@ def index():
         'version': '2.0.0',
         'endpoints': {
             '/combine': 'POST - Combine multiple files (preserves PDF formatting)',
+            '/combine-checklist': 'POST - Combine files with divider pages',
+            '/combine-unidoc': 'POST - Create UniDoc with cover, info, and index pages',
             '/health': 'GET - Health check'
         },
         'supported_formats': list(ALLOWED_EXTENSIONS),
@@ -904,18 +863,15 @@ def index():
         'features': [
             'Preserves original PDF formatting (tables, layouts, fonts)',
             'Direct PDF merging without text extraction',
-            'Smart conversion for other formats'
+            'Smart conversion for other formats',
+            'Checklist mode with section dividers',
+            'UniDoc builder for course documentation'
         ]
     }
-import os, sys, subprocess
-
-
-
-    
 
 if __name__ == '__main__':
     print("=" * 60)
     print("Universal File Combiner Backend v2.0")
     print("=" * 60)
-    port = int(os.environ.get("PORT", 5000))  # use Render's PORT, fallback to 5000 locally
+    port = int(os.environ.get("PORT", 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
