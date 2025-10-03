@@ -295,6 +295,8 @@ textarea {
     color: var(--color-secondary);
     border: 1px solid rgba(102, 126, 234, 0.15);
     transition: all var(--transition-base);
+    text-decoration: none;   /* 🔑 remove link underline */
+    cursor: pointer;         /* 🔑 show hand cursor */
 }
 
 .user-info:hover {
@@ -302,6 +304,7 @@ textarea {
         rgba(102, 126, 234, 0.15), 
         rgba(118, 75, 162, 0.15));
     transform: translateY(-2px);
+    text-decoration: none;   /* just to be safe */
 }
 
 /* ==========================================================================
