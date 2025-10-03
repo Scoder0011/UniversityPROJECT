@@ -192,6 +192,68 @@ textarea {
   color: white;
   box-shadow: 0 3px 10px rgba(102,126,234,0.4);
 }
+
+.hero-section {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    padding: var(--space-3xl) var(--space-xl);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle animated background effect */
+.hero-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    animation: heroGlow 8s ease-in-out infinite alternate;
+}
+
+@keyframes heroGlow {
+    0% { opacity: 0.3; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0.5; transform: translate(20px, 10px) scale(1.1); }
+}
+
+.hero-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: var(--font-weight-black);
+    color: var(--color-white);
+    margin: 0 0 var(--space-lg) 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-subtitle {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: rgba(255, 255, 255, 0.95);
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+    font-weight: var(--font-weight-regular);
+    position: relative;
+    z-index: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: var(--space-2xl) var(--space-lg);
+    }
+    
+    .hero-title {
+        margin-bottom: var(--space-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section {
+        padding: var(--space-xl) var(--space-md);
+    }
+}
 /* ==========================================================================
    Mode Toggle Component
    ========================================================================== */
