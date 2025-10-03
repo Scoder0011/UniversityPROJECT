@@ -828,6 +828,125 @@ def combine_unidoc():
                     os.remove(p)
             except:
                 pass
+                from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+
+def create_cover_page(output_path):
+    """Always generate the same standard cover page (Page 1)."""
+    c = canvas.Canvas(output_path, pagesize=letter)
+    width, height = letter
+    c.setFont("Helvetica-Bold", 28)
+    c.drawCentredString(width/2, height-200, "COURSE FILE")
+    c.setFont("Helvetica", 14)
+    c.drawCentredString(width/2, height-240, "Manav Rachna University")
+    c.showPage()
+    c.save()
+
+def create_course_info_page(data, output_path):
+    """Generate dynamic course info page (Page 2)."""
+    c = canvas.Canvas(output_path, pagesize=letter)
+    width, height = letter
+    c.setFont("Helvetica", 12)
+    y = height - 100
+    for label, key in [
+        ("Program & Semester", "program"),
+        ("Course Code", "code"),
+        ("Course Coordinator", "coordinator"),
+        ("Course Name", "name"),
+        ("Theory Faculty", "faculty"),
+        ("LTPC", "ltpc"),
+    ]:
+        value = data.get(key, "")
+        c.drawString(100, y, f"{label}: {value}")
+        y -= 30
+    c.showPage()
+    c.save()
+
+def create_index_page(file_keys, output_path):
+    """Page 3: checklist of 28 items with ✔ or ✗."""
+    c = canvas.Canvas(output_path, pagesize=letter)
+    width, height = letter
+    c.setFont("Helvetica-Bold", 16)
+    c.drawCentredString(width/2, height-60, "COURSE FILE INDEX")
+    c.setFont("Helvetica", 12)
+
+    y = height - 100
+    for idx in range(1, 29):
+        label = f"Item {idx}"
+        status = "✔" if str(idx) in file_keys else "✗"
+        c.drawString(100, y, f"{label:20} {status}")
+        y -= 20
+        if y < 100:  # new page if too long
+            c.showPage()
+            y = height - 60
+    c.showPage()
+    c.save()
+
+@app.route('/combine-unidoc', methods=['POST'])
+def combine_unidoc():
+    files = request.files.getlist("files")
+    if not files:
+        return {'error': 'No files uploaded'}, 400
+
+    # Collect form fields
+    course_data = {
+        'program': request.form.get('program', ''),
+        'code': request.form.get('code', ''),
+        'coordinator': request.form.get('coordinator', ''),
+        'name': request.form.get('name', ''),
+        'faculty': request.form.get('faculty', ''),
+        'ltpc': request.form.get('ltpc', '')
+    }
+
+    merger = PdfMerger()
+    temp_files = []
+
+    try:
+        # Generate the 3 front pages
+        cover_fp = os.path.join(TEMP_DIR, "cover.pdf")
+        info_fp = os.path.join(TEMP_DIR, "course_info.pdf")
+        index_fp = os.path.join(TEMP_DIR, "index.pdf")
+        create_cover_page(cover_fp)
+        create_course_info_page(course_data, info_fp)
+        create_index_page([f.filename.split('.')[0] for f in files], index_fp)
+
+        for fp in [cover_fp, info_fp, index_fp]:
+            merger.append(fp)
+            temp_files.append(fp)
+
+        # Process uploaded files (like combine_to_pdf logic)
+        for file in files:
+            if file.filename == '': continue
+            filename = secure_filename(file.filename)
+            temp_path = os.path.join(TEMP_DIR, f"{datetime.now().timestamp()}_{filename}")
+            file.save(temp_path)
+            file_type = get_file_type(filename)
+            if file_type == 'pdf':
+                merger.append(temp_path)
+            else:
+                converted_pdf = temp_path + ".pdf"
+                if file_type == 'image':
+                    image_to_pdf(temp_path, converted_pdf)
+                elif file_type == 'txt':
+                    text_to_pdf(txt_to_text(temp_path), converted_pdf)
+                elif file_type == 'docx':
+                    docx_to_pdf(temp_path, converted_pdf)
+                elif file_type == 'pptx':
+                    pptx_to_pdf(temp_path, converted_pdf)
+                merger.append(converted_pdf)
+                temp_files.append(converted_pdf)
+            temp_files.append(temp_path)
+
+        output_path = os.path.join(TEMP_DIR, f"unidoc_combined_{datetime.now().timestamp()}.pdf")
+        merger.write(output_path)
+        merger.close()
+        return send_file(output_path, as_attachment=True, download_name="unidoc_combined.pdf")
+
+    finally:
+        for p in temp_files:
+            try: os.remove(p)
+            except: pass
+
 
 @app.route('/health', methods=['GET'])
 def health_check():
