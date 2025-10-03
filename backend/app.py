@@ -22,12 +22,12 @@ from reportlab.lib import colors
 from reportlab.pdfgen import canvas
 from PIL import Image
 import io
-from auth import register_auth_routes
+
 
 app = Flask(__name__)
 CORS(app)
 
-register_auth_routes(app)
+
 
 
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'doc', 'pptx', 'ppt', 'txt', 'jpg', 'jpeg', 'png', 'gif'}
