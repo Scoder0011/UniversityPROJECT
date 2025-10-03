@@ -2,110 +2,792 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal File Combiner Pro</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-EMVR2LY107"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universal File Combiner Pro</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-EMVR2LY107"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
 
-  gtag('config', 'G-EMVR2LY107');
-</script>
+    gtag('config', 'G-EMVR2LY107');
+  </script>
 </head>
 
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <!-- Logo -->
-            <div class="logo">📁 File Combiner Pro</div>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <!-- Logo -->
+      <div class="logo">📁 File Combiner Pro</div>
 
-            <!-- Mode Toggle -->
-            <nav class="mode-toggle">
-                <button class="mode-btn active" data-mode="standard">Quick Upload</button>
-                <button class="mode-btn" data-mode="checklist">Checklist Mode</button>
-            </nav>
-    </header>
+      <!-- Mode Toggle -->
+      <nav class="mode-toggle">
+        <button class="mode-btn active" data-mode="standard">Quick Upload</button>
+        <button class="mode-btn" data-mode="checklist">Checklist Mode</button>
+        <button class="mode-btn" data-mode="unidoc">Uni Doc Builder</button>
+      </nav>
+  </header>
 
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="container">
-            <!-- Standard Upload Mode -->
-            <div class="mode-content active" id="standardMode">
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">☁️</div>
-                    <div class="upload-text">Drag & drop files here</div>
-                    <div class="upload-subtext">or tap to browse</div>
-                    <input type="file" id="fileInput" multiple accept=".pdf,.docx,.pptx,.txt,.jpg,.jpeg,.png,.gif"
-                        style="display: none;">
-                </div>
-
-                <div class="files-list" id="filesList" style="display: none;">
-                    <h3 style="margin-bottom: 20px; color: #1a1a2e;">Uploaded Files (<span id="fileCount">0</span>)</h3>
-                    <div id="filesContainer"></div>
-                </div>
-
-                <div class="action-buttons" id="standardActions" style="display: none;">
-                    <button class="action-btn combine-btn" id="combineBtn">🔗 Combine to PDF</button>
-                    <button class="action-btn clear-btn" id="clearBtn">Clear All</button>
-                </div>
-
-                <div class="status-message" id="statusMessage"></div>
-            </div>
-
-            <!-- Checklist Mode -->
-            <div class="mode-content" id="checklistMode">
-                <div class="checklist-controls">
-                    <button class="add-checklist-btn" id="addChecklistBtn">➕ Add New Checklist Section</button>
-                </div>
-
-                <div id="checklistsContainer"></div>
-
-                <div class="action-buttons" id="checklistActions" style="display: none;">
-                    <button class="action-btn combine-btn" id="combineChecklistBtn">📑 Generate PDF with
-                        Dividers</button>
-                    <button class="action-btn clear-btn" id="clearChecklistBtn">Clear All</button>
-                </div>
-
-                <div class="status-message" id="checklistStatusMessage"></div>
-            </div>
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="container">
+      <!-- Standard Upload Mode -->
+      <div class="mode-content active" id="standardMode">
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">☁️</div>
+          <div class="upload-text">Drag & drop files here</div>
+          <div class="upload-subtext">or tap to browse</div>
+          <input type="file" id="fileInput" multiple accept=".pdf,.docx,.pptx,.txt,.jpg,.jpeg,.png,.gif"
+            style="display: none;">
         </div>
+
+        <div class="files-list" id="filesList" style="display: none;">
+          <h3 style="margin-bottom: 20px; color: #1a1a2e;">Uploaded Files (<span id="fileCount">0</span>)</h3>
+          <div id="filesContainer"></div>
+        </div>
+
+        <div class="action-buttons" id="standardActions" style="display: none;">
+          <button class="action-btn combine-btn" id="combineBtn">🔗 Combine to PDF</button>
+          <button class="action-btn clear-btn" id="clearBtn">Clear All</button>
+        </div>
+
+        <div class="status-message" id="statusMessage"></div>
+      </div>
+
+      <!-- Checklist Mode -->
+      <div class="mode-content" id="checklistMode">
+        <div class="checklist-controls">
+          <button class="add-checklist-btn" id="addChecklistBtn">➕ Add New Checklist Section</button>
+        </div>
+
+        <div id="checklistsContainer"></div>
+
+        <div class="action-buttons" id="checklistActions" style="display: none;">
+          <button class="action-btn combine-btn" id="combineChecklistBtn">📑 Generate PDF with
+            Dividers</button>
+          <button class="action-btn clear-btn" id="clearChecklistBtn">Clear All</button>
+        </div>
+
+        <div class="status-message" id="checklistStatusMessage"></div>
+      </div>
     </div>
 
-    <!-- Footer -->
-    <div class="footer">
-        <div class="footer-content">
-            <!-- Left -->
-            <div class="footer-left">
-                <div class="footer-logo">📁 File Combiner Pro</div>
-                <p class="footer-tagline">Merge, organize & simplify your files in one click.</p>
-            </div>
+    <div class="mode-content" id="unidocbuilderMode">
+      <section id="course-file-contents" class="cfc">
 
-            <!-- Center -->
-            <div class="footer-links">
-                <a href="about.html">About</a>
-                <a href="help.html">Help</a>
-                <a href="contact.html">Contact</a>
-                <a href="privacy.html">Privacy</a>
-            </div>
+        <div class="cfc-header">
+
+          <h2>📚 Course File Contents</h2>
+          <div class="course-meta">
+            <label>
+              <strong>Program & Semester:</strong>
+              <input type="text" placeholder="Enter Program & Semester" />
+            </label>
+
+            <label>
+              <strong>Course Code:</strong>
+              <input type="text" placeholder="Enter Course Code" />
+            </label>
+
+            <label>
+              <strong>Course Coordinator:</strong>
+              <input type="text" placeholder="Enter Coordinator Name" />
+            </label>
+
+            <label>
+              <strong>Course Name:</strong>
+              <input type="text" placeholder="Enter Course Name" />
+            </label>
+
+            <label>
+              <strong>Theory Faculty:</strong>
+              <input type="text" placeholder="Enter Theory Faculty" />
+            </label>
+
+            <label>
+              <strong>LTPC:</strong>
+              <input type="text" placeholder="e.g. THEORY: 1-0-0-1 LAB: 0-0-2-1" />
+            </label>
+          </div>
         </div>
 
-        
-        <!-- Bottom bar -->
-        <div class="footer-bottom">
-            <p>© 2025 File Combiner Pro. Crafted with ❤️ by <strong>Scoder</strong> </p>
-            <a href="https://manavrachna.edu.in/" target="_blank" rel="noopener noreferrer" class="sponsor-inline">
-                <span>Powered by</span>
-                <img src="logo.jpg" alt="Manav Rachna University Logo" class="sponsor-logo">
-            </a>
+        <!-- Group 1: Course File Checklist -->
+        <div class="group">
+          <button class="toggle-btn" onclick="togglePanel('group1', this)">
+            COURSE FILE CHECKLIST
+            <span>▾</span>
+          </button>
+          <div id="group1" class="panel">
+            <ul class="items">
+              <li data-key="1">
+                <span class="idx">1.</span>
+                <span class="title">Vision and Mission of the University</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
 
+              <li data-key="2">
+                <span class="idx">2.</span>
+                <span class="title">Vision and Mission of the School</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="3">
+                <span class="idx">3.</span>
+                <span class="title">Vision and Mission of the Department, if applicable</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="4">
+                <span class="idx">4.</span>
+                <span class="title">GA's, PEOs, POs and PSOs of the Program</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="5">
+                <span class="idx">5.</span>
+                <span class="title">List of KSA Profiles of the Program</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="6">
+                <span class="idx">6.</span>
+                <span class="title">List of faculty members teaching the course</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="7">
+                <span class="idx">7.</span>
+                <span class="title">Academic Calendar</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="8">
+                <span class="idx">8.</span>
+                <span class="title">Time table of concerned faculty members teaching the course</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Group 2: Outcome Based Course Design -->
+        <div class="group">
+          <button class="toggle-btn" onclick="togglePanel('group2', this)">
+            OUTCOME BASED COURSE DESIGN
+            <span>▾</span>
+          </button>
+          <div id="group2" class="panel">
+            <ul class="items">
+              <li>
+                <span class="idx">9.</span>
+                <span class="title">Course Design of Theory component</span>
+                <button class="toggle-btn small" onclick="toggleSubItems('sub9', this)">Expand ▾</button>
+              </li>
+              <ul id="sub9" class="sub-items">
+                <li data-key="9a">
+                  <span class="sub-title">a. KSA Profile Elements of the Theory component</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="9b">
+                  <span class="sub-title">b. List of SDGs/Ethics/Skill Levels & NSQF levels</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="9c">
+                  <span class="sub-title">c. Course Objective and List of Course Outcomes</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="9d">
+                  <span class="sub-title">d. Mapping to Skill/Employment/Entrepreneurship</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="9e">
+                  <span class="sub-title">e. Relevance of the Theory component</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="9f">
+                  <span class="sub-title">f. Syllabus with Text books, Reference books, Online Resources, MOOCs</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="9g">
+                  <span class="sub-title">g. Lesson Plan including innovative pedagogies and ICT Tools</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="9h">
+                  <span class="sub-title">h. CO-PO Mapping</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="9i">
+                  <span class="sub-title">i. CO-KSA Mapping</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="9j">
+                  <span class="sub-title">j. Course Assessment Plan</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+              </ul>
+
+              <li>
+                <span class="idx">10.</span>
+                <span class="title">Course Design of Lab component</span>
+                <button class="toggle-btn small" onclick="toggleSubItems('sub10', this)">Expand ▾</button>
+              </li>
+              <ul id="sub10" class="sub-items">
+                <li data-key="10a">
+                  <span class="sub-title">a. KSA Profile Elements of the Lab component</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="10b">
+                  <span class="sub-title">b. List of SDGs/Ethics/Skill Levels & NSQF levels</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="10c">
+                  <span class="sub-title">c. Course Objective and List of Course Outcomes</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="10d">
+                  <span class="sub-title">d. Mapping to Skill/Employment/Entrepreneurship</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="10e">
+                  <span class="sub-title">e. Relevance of the Lab Course</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="10f">
+                  <span class="sub-title">f. List of Experiments</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="10g">
+                  <span class="sub-title">g. Lab Text books, Reference books, Online Resources, MOOCs</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="10h">
+                  <span class="sub-title">h. Lesson Plan including innovative pedagogies and ICT Tools</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="10i">
+                  <span class="sub-title">i. CO-PO Mapping</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="10j">
+                  <span class="sub-title">j. CO-KSA Mapping</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+                <li data-key="10k">
+                  <span class="sub-title">k. Course Assessment Plan</span>
+                  <div class="controls">
+                    <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                    <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                    <button class="btn preview" disabled>Preview</button>
+                    <button class="btn delete" disabled>Delete</button>
+                    <span class="filename"></span>
+                  </div>
+                </li>
+              </ul>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Group 3: Outcome Based Teaching -->
+        <div class="group">
+          <button class="toggle-btn" onclick="togglePanel('group3', this)">
+            OUTCOME BASED TEACHING, LEARNING & ASSESSMENT
+            <span>▾</span>
+          </button>
+          <div id="group3" class="panel">
+            <ul class="items">
+              <li data-key="11">
+                <span class="idx">11.</span>
+                <span class="title">Attendance Record for theory and labs</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.xlsx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="12">
+                <span class="idx">12.</span>
+                <span class="title">Lecture Notes and PowerPoint handouts (10% of entire content)</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="13">
+                <span class="idx">13.</span>
+                <span class="title">Tutorials/Assignments</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="14">
+                <span class="idx">14.</span>
+                <span class="title">Solution of Tutorials/Assignments (2 each)</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="15">
+                <span class="idx">15.</span>
+                <span class="title">Mid-Sem Question Paper</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="16">
+                <span class="idx">16.</span>
+                <span class="title">End-Term Question Paper</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="17">
+                <span class="idx">17.</span>
+                <span class="title">Solution of Mid-Sem and End-Term Question Papers</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="18">
+                <span class="idx">18.</span>
+                <span class="title">Question Papers / Continuous Assessment Sheets (2 each) for all other assessment
+                  tools
+                  as per Course Assessment Plan</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.xlsx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="19">
+                <span class="idx">19.</span>
+                <span class="title">Rubrics for Lab assessments and miniprojects</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.xlsx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="20">
+                <span class="idx">20.</span>
+                <span class="title">Records of Rubrics based Evaluation of Lab Assessments</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.xlsx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="21">
+                <span class="idx">21.</span>
+                <span class="title">Note on how the course can contribute to the ePortfolio of Students</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="22">
+                <span class="idx">22.</span>
+                <span class="title">Records of Assessments based on Student ePortfolios</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.xlsx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="23">
+                <span class="idx">23.</span>
+                <span class="title">Continuous Evaluation for all Assessments as per Course Assessment Plan from
+                  ERP</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.xlsx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="24">
+                <span class="idx">24.</span>
+                <span class="title">Minutes of Course Coordinator Level Meetings with Feedback Analysis and Action Taken
+                  Report</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Group 4: CO-PO Attainment -->
+        <div class="group">
+          <button class="toggle-btn" onclick="togglePanel('group4', this)">
+            CO-PO ATTAINMENT
+            <span>▾</span>
+          </button>
+          <div id="group4" class="panel">
+            <ul class="items">
+              <li data-key="25">
+                <span class="idx">25.</span>
+                <span class="title">CO attainment analysis and action taken for the course, including direct and
+                  indirect
+                  assessments from Phase 1 to Phase 3</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.xlsx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="26">
+                <span class="idx">26.</span>
+                <span class="title">List of slow learners (Slow Learners are those having an average Student CO
+                  attainment
+                  of less than 40% uptill Phase 1 of the semester and the remaining are Advanced Learners)</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.xlsx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="27">
+                <span class="idx">27.</span>
+                <span class="title">The action taken to support slow and advanced learners and progress of slow learners
+                  from Phase 1 to Phase 3. For advanced learners their progress in terms of participation in projects,
+                  hackathons, competitions, publications, etc.</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="28">
+                <span class="idx">28.</span>
+                <span class="title">Impact Analysis Report and Action Taken for Next Academic Cycle</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx" />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Group 5: Appendices -->
+        <div class="group">
+          <button class="toggle-btn" onclick="togglePanel('group5', this)">
+            APPENDICES (attach hardcopies of samples)
+            <span>▾</span>
+          </button>
+          <div id="group5" class="panel">
+            <ul class="items">
+              <li data-key="A">
+                <span class="idx">A.</span>
+                <span class="title">Sample hardcopies of Tutorials (4 samples: 2 for Slow and 2 for Advanced Learners)
+                  and
+                  Assignments (4 samples: 2 for Slow and 2 for Advanced Learners) submitted by students</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" multiple />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+
+              <li data-key="B">
+                <span class="idx">B.</span>
+                <span class="title">Sample hardcopies of answer sheets of Mid-Sem Exams (4 samples: 2 for Slow and 2 for
+                  Advanced Learners) and End-Term Exams (4 samples: 2 for Slow and 2 for Advanced Learners)</span>
+                <div class="controls">
+                  <input class="file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" multiple />
+                  <button class="btn upload" onclick="handleUpload(this)">Upload</button>
+                  <button class="btn preview" disabled>Preview</button>
+                  <button class="btn delete" disabled>Delete</button>
+                  <span class="filename"></span>
+                </div>
+              </li>
+            </ul>
+          </div>
         </div>
     </div>
+    <!-- ✅ Action Buttons for UniDoc -->
+    <div class="action-buttons" id="unidocActions" style="margin-top: 20px; display: none; gap: 15px;">
+
+      <button class="action-btn combine-btn" id="combineUniDocBtn">📑 Merge Uni Docs to PDF</button>
+      <button class="action-btn clear-btn" id="clearUniDocBtn">Clear All</button>
+    </div>
+
+    <!-- Status Message -->
+    <div class="status-message" id="unidocStatusMessage"></div>
+    </section>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-content">
+      <!-- Left -->
+      <div class="footer-left">
+        <div class="footer-logo">📁 File Combiner Pro</div>
+        <p class="footer-tagline">Merge, organize & simplify your files in one click.</p>
+      </div>
+
+      <!-- Center -->
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="help.html">Help</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+      </div>
+    </div>
+
+
+    <!-- Bottom bar -->
+    <div class="footer-bottom">
+      <p>© 2025 File Combiner Pro. Crafted with ❤️ by <strong>Scoder</strong> </p>
+      <a href="https://manavrachna.edu.in/" target="_blank" rel="noopener noreferrer" class="sponsor-inline">
+        <span>Powered by</span>
+        <img src="logo.jpg" alt="Manav Rachna University Logo" class="sponsor-logo">
+      </a>
+
+    </div>
+  </div>
 
 </body>
 <script src="script.js"></script>
