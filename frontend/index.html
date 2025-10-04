@@ -29,6 +29,7 @@
         <button class="mode-btn active" data-mode="standard">Quick Upload</button>
         <button class="mode-btn" data-mode="checklist">Checklist Mode</button>
         <button class="mode-btn" data-mode="unidoc">Uni Doc Builder</button>
+        <button class="mode-btn" data-mode="pagecutter">Page Cutter</button>
       </nav>
   </header>
 
@@ -757,6 +758,67 @@
     <!-- Status Message -->
     <div class="status-message" id="unidocStatusMessage"></div>
     </section>
+    <div class="mode-content" id="pagecutterMode">
+  <!-- Sub-mode toggle -->
+  <div class="pagecutter-toggle" style="display: flex; gap: 15px; justify-content: center; margin-bottom: 30px;">
+    <button class="sub-mode-btn active" data-submode="single">Single Extractor</button>
+    <button class="sub-mode-btn" data-submode="mix">Mix Extractor</button>
+  </div>
+
+  <!-- SINGLE EXTRACTOR -->
+  <div class="pagecutter-submode active" id="singleExtractorMode">
+    <div class="upload-area" id="singleUploadArea" style="cursor: pointer;">
+      <div class="upload-icon">📄</div>
+      <div class="upload-text">Upload a single file</div>
+      <div class="upload-subtext">PDF, DOCX, PPTX, TXT, JPG, PNG, GIF</div>
+      <input type="file" id="singleFileInput" accept=".pdf,.docx,.pptx,.txt,.jpg,.jpeg,.png,.gif" style="display: none;">
+    </div>
+
+    <!-- Page Preview Area -->
+    <div id="singlePreviewArea" style="display: none; margin-top: 30px;">
+      <h3 style="margin-bottom: 20px; color: #1a1a2e;">
+        <span id="singleFileName"></span> - <span id="singlePageCount"></span> pages
+      </h3>
+      <div style="margin-bottom: 15px; color: #666;">
+        Click pages to toggle removal (red = will be removed)
+      </div>
+      <div id="singlePageGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;"></div>
+      
+      <div class="action-buttons" style="display: flex; gap: 15px;">
+        <button class="action-btn combine-btn" id="extractSingleBtn">✂️ Extract Selected Pages</button>
+        <button class="action-btn clear-btn" id="clearSingleBtn">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MIX EXTRACTOR -->
+  <div class="pagecutter-submode" id="mixExtractorMode">
+    <div class="upload-area" id="mixUploadArea" style="cursor: pointer;">
+      <div class="upload-icon">📚</div>
+      <div class="upload-text">Upload multiple files</div>
+      <div class="upload-subtext">All remaining pages will be merged into one PDF</div>
+      <input type="file" id="mixFileInput" multiple accept=".pdf,.docx,.pptx,.txt,.jpg,.jpeg,.png,.gif" style="display: none;">
+    </div>
+
+    <!-- Multi-file Preview Area -->
+    <div id="mixPreviewArea" style="display: none; margin-top: 30px;">
+      <h3 style="margin-bottom: 20px; color: #1a1a2e;">
+        <span id="mixFileCount"></span> files uploaded
+      </h3>
+      <div style="margin-bottom: 15px; color: #666;">
+        Click pages to toggle removal (red = will be removed)
+      </div>
+      <div id="mixFilesContainer"></div>
+      
+      <div class="action-buttons" style="display: flex; gap: 15px; margin-top: 30px;">
+        <button class="action-btn combine-btn" id="extractMixBtn">🔗 Mix & Extract</button>
+        <button class="action-btn clear-btn" id="clearMixBtn">Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-message" id="pagecutterStatusMessage"></div>
+</div>
 
   </div>
 
