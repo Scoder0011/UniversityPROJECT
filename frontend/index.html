@@ -8,14 +8,19 @@
   <title>Universal File Combiner Pro</title>
   <meta name="description" content="Merge, organize & simplify your files in one click">
   <meta name="theme-color" content="#667eea">
+
+  <!-- PWA manifest & icons -->
   <link rel="manifest" href="/manifest.json">
-   <link rel="apple-touch-icon" href="/icon-192.png">
-  
-  
-  <!--<meta name="apple-mobile-web-app-capable" content="yes">-->
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png"> <!-- iOS home-screen icon -->
+
+  <!-- Cross-platform installable behaviour -->
+  <meta name="mobile-web-app-capable" content="yes">         <!-- modern / non-iOS browsers -->
+  <meta name="apple-mobile-web-app-capable" content="yes">   <!-- iOS (harmless Chrome deprecation warning may appear) -->
   <meta name="apple-mobile-web-app-title" content="File Combiner">
-  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <!-- Optional: Windows tile color -->
+  <meta name="msapplication-TileColor" content="#667eea">
   <link rel="stylesheet" href="style.css">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-EMVR2LY107"></script>
