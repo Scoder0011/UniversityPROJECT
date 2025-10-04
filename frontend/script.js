@@ -669,6 +669,30 @@ window.addEventListener('appinstalled', () => {
     installContainer.remove();
   }
 });
+// Add after your existing PWA setup code
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+function isInStandaloneMode() {
+  return ('standalone' in window.navigator) && (window.navigator.standalone);
+}
+
+// Show iOS install instructions
+if (isIOS() && !isInStandaloneMode()) {
+  setTimeout(() => {
+    const iosPrompt = document.createElement('div');
+    iosPrompt.className = 'ios-install-prompt';
+    iosPrompt.innerHTML = `
+      <button class="close-install" onclick="this.parentElement.remove()">×</button>
+      <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Install App</div>
+      <div style="font-size: 14px; color: #666;">
+        Tap <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%23007AFF'%3E%3Cpath d='M16 5l-1.42 1.42-1.59-1.59V16h-1.98V4.83L9.42 6.42 8 5l4-4 4 4zm4 5v11c0 1.1-.9 2-2 2H6c-1.11 0-2-.9-2-2V10c0-1.11.89-2 2-2h3v2H6v11h12V10h-3V8h3c1.1 0 2 .89 2 2z'/%3E%3C/svg%3E" style="width:16px;height:16px;vertical-align:middle;"/> then "Add to Home Screen"
+      </div>
+    `;
+    document.body.appendChild(iosPrompt);
+  }, 2000);
+}
 
 // Detect if already installed
 window.addEventListener('DOMContentLoaded', () => {
