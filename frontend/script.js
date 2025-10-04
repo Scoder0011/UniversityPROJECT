@@ -586,3 +586,97 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+// Add this to the TOP of your script.js file
+
+// ==================== PWA SETUP ====================
+let deferredPrompt;
+const installContainer = document.createElement('div');
+installContainer.className = 'install-container';
+installContainer.innerHTML = `
+  <button class="close-install" id="closeInstall">×</button>
+  <button class="install-btn" id="installBtn">
+    <span class="icon">⬇️</span>
+    <span>Install App</span>
+  </button>
+`;
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(registration => {
+        console.log('✅ Service Worker registered:', registration.scope);
+      })
+      .catch(error => {
+        console.log('❌ Service Worker registration failed:', error);
+      });
+  });
+}
+
+// Handle PWA install prompt
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  
+  // Show install button after a short delay (better UX)
+  setTimeout(() => {
+    document.body.appendChild(installContainer);
+    installContainer.classList.add('show');
+  }, 2000);
+});
+
+// Install button click
+document.addEventListener('click', async (e) => {
+  if (e.target.closest('#installBtn')) {
+    if (!deferredPrompt) return;
+    
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    console.log(`User response: ${outcome}`);
+    
+    if (outcome === 'accepted') {
+      console.log('✅ PWA installed');
+    }
+    
+    deferredPrompt = null;
+    installContainer.classList.remove('show');
+    
+    setTimeout(() => {
+      if (installContainer.parentNode) {
+        installContainer.remove();
+      }
+    }, 400);
+  }
+  
+  // Close button
+  if (e.target.closest('#closeInstall')) {
+    installContainer.classList.remove('show');
+    setTimeout(() => {
+      if (installContainer.parentNode) {
+        installContainer.remove();
+      }
+    }, 400);
+  }
+});
+
+// Handle successful installation
+window.addEventListener('appinstalled', () => {
+  console.log('✅ PWA was installed successfully');
+  deferredPrompt = null;
+  
+  if (installContainer.parentNode) {
+    installContainer.remove();
+  }
+});
+
+// Detect if already installed
+window.addEventListener('DOMContentLoaded', () => {
+  // Check if running as installed PWA
+  if (window.matchMedia('(display-mode: standalone)').matches || 
+      window.navigator.standalone === true) {
+    console.log('✅ Running as installed PWA');
+  }
+});
+
+// ==================== END PWA SETUP ====================
