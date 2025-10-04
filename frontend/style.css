@@ -1,3 +1,4 @@
+
 /* ==========================================================================
    CSS Custom Properties (Design Tokens)
    ========================================================================== */
@@ -1414,117 +1415,7 @@ textarea {
     from { width: 0; }
     to { width: 100%; }
 }
-/* Page Cutter Styles */
-.sub-mode-btn {
-  padding: 12px 24px;
-  border: 2px solid #667eea;
-  background: white;
-  color: #667eea;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-}
 
-.sub-mode-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.sub-mode-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-.pagecutter-submode {
-  display: none;
-}
-
-.pagecutter-submode.active {
-  display: block;
-}
-
-.page-thumbnail {
-  position: relative;
-  border: 3px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 8px;
-  cursor: pointer;
-  transition: all 0.3s;
-  background: white;
-}
-
-.page-thumbnail:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.page-thumbnail.selected {
-  border-color: #ef4444;
-  background: #fee;
-}
-
-.page-thumbnail img {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 4px;
-}
-
-.page-number {
-  text-align: center;
-  margin-top: 8px;
-  font-weight: 600;
-  color: #1a1a2e;
-}
-
-.page-thumbnail.selected .page-number {
-  color: #ef4444;
-}
-
-.file-section {
-  margin-bottom: 30px;
-  padding: 20px;
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
-  background: #f9fafb;
-}
-
-.file-section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #e0e0e0;
-}
-
-.file-section-title {
-  font-size: 1.1em;
-  font-weight: 600;
-  color: #1a1a2e;
-}
-
-.select-controls {
-  display: flex;
-  gap: 10px;
-}
-
-.select-controls button {
-  padding: 6px 12px;
-  border: 1px solid #667eea;
-  background: white;
-  color: #667eea;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9em;
-  transition: all 0.2s;
-}
-
-.select-controls button:hover {
-  background: #667eea;
-  color: white;
-}
 /* ==========================================================================
    Responsive Design
    ========================================================================== */
