@@ -11,19 +11,17 @@ const urlsToCache = [
   '/script.js',
   '/logo.jpg'
 ];
-
 // Install event - cache resources
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache:', CACHE_NAME);
+        console.log('Opened cache');
         return cache.addAll(urlsToCache);
       })
   );
-  self.skipWaiting(); // Force new service worker to activate immediately
+  self.skipWaiting();
 });
-
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
   event.waitUntil(
@@ -38,59 +36,35 @@ self.addEventListener('activate', event => {
       );
     })
   );
-  self.clients.claim(); // Take control immediately
+  self.clients.claim();
 });
-
-// Fetch event - Network First for HTML, Cache First for assets
+// Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
-  
   // Skip API calls - always fetch from network
-  if (url.hostname.includes('file-combiner.onrender.com')) {
+  if (event.request.url.includes('file-combiner.onrender.com')) {
     return event.respondWith(fetch(event.request));
   }
-
-  // Network First for HTML files (always get latest)
-  if (event.request.headers.get('accept').includes('text/html')) {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          // Update cache with new version
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseClone);
-          });
-          return response;
-        })
-        .catch(() => {
-          // Fallback to cache if offline
-          return caches.match(event.request);
-        })
-    );
-    return;
-  }
-
-  // Cache First for other assets (JS, CSS, images)
   event.respondWith(
     caches.match(event.request)
       .then(response => {
+        // Cache hit - return response
         if (response) {
           return response;
         }
-        
+        // Clone the request
         const fetchRequest = event.request.clone();
         return fetch(fetchRequest).then(response => {
+          // Check if valid response
           if (!response || response.status !== 200 || response.type !== 'basic') {
             return response;
           }
-          
+          // Clone the response
           const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseToCache);
-          });
-          
+          caches.open(CACHE_NAME)
+            .then(cache => {
+              cache.put(event.request, responseToCache);
+            });
           return response;
         });
       })
   );
-});
