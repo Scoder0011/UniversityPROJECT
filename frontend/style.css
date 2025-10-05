@@ -1,5 +1,3 @@
-
-
 /* ==========================================================================
    CSS Custom Properties (Design Tokens)
    ========================================================================== */
@@ -499,10 +497,7 @@ textarea {
 #unidocActions {
   justify-content: center; /* or flex-start / flex-end */
 }
-#unidocActions {
-  display: none;
-  justify-content: center;
-}
+
 
 .cfc {
     width: 100%;
@@ -1796,18 +1791,102 @@ textarea {
     }
 }
 
-/* Auto dark mode support */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --color-neutral-100: #2a2a3e;
-        --color-neutral-200: #333349;
-        --color-neutral-900: #e8e8f0;
-        --color-overlay: rgba(26, 26, 46, 0.95);
-    }
-    
-    body { color: #e8e8f0; }
-    .upload-text, .file-name, .title { color: #e8e8f0; }
-    .checklist-section, .file-item { 
-        background: linear-gradient(135deg, #2a2a3e, #252535);
-    }
+/* Remove the @media query and apply dark mode styles directly */
+
+:root {
+    --color-overlay: rgba(26, 26, 46, 0.95);
+    --color-neutral-100: #2a2a3e;
+    --color-neutral-200: #333349;
+    --color-neutral-300: #3d3d54;
+    --color-neutral-900: #e8e8f0;
+    --color-white: #1a1a2e;
+}
+
+body {
+    background: linear-gradient(135deg, #0a0a14 0%, #0d111f 50%, #0a1929 100%);
+    color: #e8e8f0;
+}
+
+.header {
+    background: rgba(26, 26, 46, 0.95);
+    border-bottom-color: rgba(102, 126, 234, 0.3);
+}
+
+.container {
+    background: rgba(26, 26, 46, 0.85);
+}
+
+.upload-text,
+.file-name,
+.logo,
+.title {
+    color: #e8e8f0;
+}
+
+.upload-subtext,
+.sub-title {
+    color: #9ca3af;
+}
+
+.mode-toggle {
+    background: rgba(42, 42, 62, 0.5);
+}
+
+.mode-btn {
+    color: #9ca3af;
+}
+
+.mode-btn:hover:not(.active) {
+    color: #c7d2fe;
+}
+
+.upload-area,
+.checklist-upload-area {
+    background: linear-gradient(135deg, rgba(42, 42, 62, 0.3), rgba(31, 31, 46, 0.3));
+    border-color: rgba(102, 126, 234, 0.4);
+}
+
+.checklist-section {
+    background: linear-gradient(135deg, #2a2a3e, #1f1f2e);
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+.file-item,
+.items > li {
+    background: linear-gradient(135deg, #2a2a3e, #252535);
+    border-color: rgba(102, 126, 234, 0.15);
+}
+
+.checklist-name-input,
+.course-meta input {
+    background: #2a2a3e;
+    color: #e8e8f0;
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+.checklist-name-input::placeholder,
+.course-meta input::placeholder {
+    color: #6b7280;
+}
+
+.panel {
+    background: #1f1f2e;
+}
+
+.sub-items li {
+    background: rgba(42, 42, 62, 0.6);
+    border-color: rgba(102, 126, 234, 0.15);
+}
+
+.sub-items li:hover {
+    background: rgba(42, 42, 62, 0.9);
+}
+
+.clear-btn {
+    background: #333349;
+    color: #e8e8f0;
+}
+
+.clear-btn:hover {
+    background: #3d3d54;
 }
