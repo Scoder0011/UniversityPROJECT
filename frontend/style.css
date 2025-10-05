@@ -108,8 +108,8 @@ body {
         var(--color-tertiary) 50%, 
         var(--color-accent) 100%);
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    display: flex;           /* Make sure this is here */
+    flex-direction: column;   /* Make sure this is here */
     line-height: 1.6;
     color: var(--color-neutral-900);
 }
@@ -1128,6 +1128,7 @@ textarea {
   padding: 16px 20px 12px;
   margin-top: 24px;
   width: 100%;
+   flex-shrink: 0;
 }
 
 .footer-content {
