@@ -29,6 +29,67 @@ import io
 
 app = Flask(__name__)
 CORS(app)
+# ---------- Maintenance mode middleware (drop this after CORS(app)) ----------
+from flask import make_response, send_from_directory
+
+# Config via environment variables
+MAINTENANCE_MODE = os.environ.get("MAINTENANCE_MODE", "false").lower() == "true"
+MAINTENANCE_ALLOWED_IPS = set(ip.strip() for ip in os.environ.get("MAINTENANCE_ALLOWED_IPS", "").split(",") if ip.strip())
+MAINTENANCE_BYPASS_HEADER = os.environ.get("MAINTENANCE_BYPASS_HEADER", "X-MAINTENANCE-BYPASS")
+MAINTENANCE_HTML = os.environ.get("MAINTENANCE_HTML", "maintenance.html")  # filename in project root or static folder
+MAINTENANCE_EXEMPT_PATHS = {
+    '/',           # root info endpoint
+    '/health',     # keep health checks working
+    '/favicon.ico' # allow favicon
+}
+
+@app.before_request
+def check_maintenance():
+    # Re-evaluate the flag every request in case env changes (Render restarts still recommended)
+    global MAINTENANCE_MODE
+    MAINTENANCE_MODE = os.environ.get("MAINTENANCE_MODE", "false").lower() == "true"
+
+    # If maintenance not active -> normal flow
+    if not MAINTENANCE_MODE:
+        return None
+
+    # Allow certain paths to continue (health checks / root info)
+    if request.path in MAINTENANCE_EXEMPT_PATHS:
+        return None
+
+    # Allow whitelisted IPs (optional)
+    if MAINTENANCE_ALLOWED_IPS:
+        remote_addr = request.headers.get('X-Forwarded-For', request.remote_addr)
+        # X-Forwarded-For might contain a comma list; take first
+        remote_addr = remote_addr.split(',')[0].strip() if remote_addr else ''
+        if remote_addr in MAINTENANCE_ALLOWED_IPS:
+            return None
+
+    # Allow bypass header (optional) - useful for testing with curl:
+    # curl -H "X-MAINTENANCE-BYPASS: letmein" ...
+    if request.headers.get(MAINTENANCE_BYPASS_HEADER):
+        return None
+
+    # Serve a static maintenance HTML if present (good UX)
+    try:
+        project_root = os.path.abspath(os.path.dirname(__file__))
+        html_path = os.path.join(project_root, MAINTENANCE_HTML)
+        if os.path.exists(html_path):
+            # for browsers: return HTML page with 503 status
+            resp = make_response(send_from_directory(project_root, MAINTENANCE_HTML), 503)
+            resp.headers['Retry-After'] = '3600'   # optional hint to clients / load balancers
+            return resp
+    except Exception:
+        pass
+
+    # Otherwise return compact JSON message with 503
+    return {
+        'error': 'Service temporarily under maintenance',
+        'status': 'maintenance',
+        'retry_after_seconds': 3600
+    }, 503
+# ---------------------------------------------------------------------------
+
 
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'doc', 'pptx', 'ppt', 'txt', 'jpg', 'jpeg', 'png', 'gif'}
 TEMP_DIR = tempfile.gettempdir()
