@@ -36,7 +36,7 @@ function switchMode(mode) {
   currentMode = mode;
 
   document.querySelectorAll('.mode-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.mode === mode);
+    btn.classList.('active', btn.dataset.mode === mode);
   });
 
   const idMap = {
