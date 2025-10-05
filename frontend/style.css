@@ -491,11 +491,10 @@ textarea {
 /* ==========================================================================
    UNI DOC BUILDER MODE - Course File Contents Styles
    ========================================================================== */
-   #unidocbuilderMode .container {
-  display: none;
-}
-#unidocActions {
-  justify-content: center; /* or flex-start / flex-end */
+  #unidocActions {
+  display: flex; /* Will be controlled by JS */
+  justify-content: center;
+  gap: 15px;
 }
 
 
