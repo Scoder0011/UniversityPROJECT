@@ -1,5 +1,5 @@
 // Change this version number EVERY time you deploy
-const CACHE_NAME = 'file-combiner-v2'; // ← Change this!
+const CACHE_NAME = 'file-combiner-v2.1'; // ← Change this!
 const urlsToCache = [
   '/',
   '/index.html',
