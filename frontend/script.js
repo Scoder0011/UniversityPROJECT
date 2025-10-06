@@ -612,7 +612,27 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
-
+// Download Sample PDF button
+document.getElementById('downloadSampleBtn')?.addEventListener('click', function() {
+  // Create a temporary link to download the PDF
+  const link = document.createElement('a');
+  link.href = 'SAMPLE FILE.pdf'; // Replace with your actual PDF filename/path
+  link.download = 'Course_File_Sample.pdf';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  // Optional: Show confirmation message
+  const statusMsg = document.getElementById('unidocStatusMessage');
+  if (statusMsg) {
+    statusMsg.textContent = '✅ Sample PDF downloaded!';
+    statusMsg.style.display = 'block';
+    statusMsg.style.color = '#10b981';
+    setTimeout(() => {
+      statusMsg.style.display = 'none';
+    }, 3000);
+  }
+});
 // Handle PWA install prompt
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
