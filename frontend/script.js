@@ -7,7 +7,70 @@
 */
 
 const API_BASE = 'https://file-combiner.onrender.com';
-
+// Real progress tracking with XMLHttpRequest
+function uploadWithProgress(url, formData, mode, onComplete, onError) {
+  const xhr = new XMLHttpRequest();
+  
+  const progressContainer = document.getElementById(`${mode}Progress`);
+  const progressBar = document.getElementById(`${mode}ProgressBar`);
+  const progressText = document.getElementById(`${mode}ProgressText`);
+  
+  progressContainer.classList.add('active');
+  
+  // Track upload progress
+  xhr.upload.addEventListener('progress', (e) => {
+    if (e.lengthComputable) {
+      const percentComplete = Math.round((e.loaded / e.total) * 50); // Upload is 0-50%
+      progressBar.style.width = `${percentComplete}%`;
+      progressBar.textContent = `${percentComplete}%`;
+      progressText.textContent = `Uploading... ${percentComplete}%`;
+    }
+  });
+  
+  // Track download/processing progress
+  xhr.addEventListener('progress', (e) => {
+    if (e.lengthComputable) {
+      const percentComplete = 50 + Math.round((e.loaded / e.total) * 50); // Processing is 50-100%
+      progressBar.style.width = `${percentComplete}%`;
+      progressBar.textContent = `${percentComplete}%`;
+      progressText.textContent = `Processing... ${percentComplete}%`;
+    }
+  });
+  
+  xhr.addEventListener('load', () => {
+    if (xhr.status === 200) {
+      progressBar.style.width = '100%';
+      progressBar.textContent = '100%';
+      progressText.textContent = 'Complete! ✓';
+      
+      const blob = xhr.response;
+      onComplete(blob);
+      
+      setTimeout(() => {
+        progressContainer.classList.remove('active');
+      }, 2000);
+    } else {
+      onError(new Error(`Server error: ${xhr.status}`));
+      progressContainer.classList.remove('active');
+    }
+  });
+  
+  xhr.addEventListener('error', () => {
+    onError(new Error('Network error'));
+    progressContainer.classList.remove('active');
+  });
+  
+  xhr.addEventListener('abort', () => {
+    onError(new Error('Upload cancelled'));
+    progressContainer.classList.remove('active');
+  });
+  
+  xhr.open('POST', url);
+  xhr.responseType = 'blob';
+  xhr.send(formData);
+  
+  return xhr; // Return so you can abort if needed
+}
 // Fetch with timeout (single definition)
 function fetchWithTimeout(resource, options = {}, timeout = 120000) {
   const controller = new AbortController();
@@ -143,31 +206,31 @@ combineBtn.addEventListener('click', async () => {
     return;
   }
 
-  showStatus('Processing files...', 'processing');
   combineBtn.disabled = true;
 
   try {
     const formData = new FormData();
     standardFiles.forEach(file => formData.append('files', file));
 
-    const response = await fetchWithTimeout(`${API_BASE}/combine`, {
-      method: 'POST',
-      body: formData
-    });
-
-    if (!response.ok) throw new Error('Combination failed');
-
-    const blob = await response.blob();
-    downloadFile(blob, `combined_${Date.now()}.pdf`);
-
-    showStatus('✓ Files combined successfully!', 'success');
+    uploadWithProgress(
+      `${API_BASE}/combine`,
+      formData,
+      'standard',
+      (blob) => {
+        downloadFile(blob, `combined_${Date.now()}.pdf`);
+        showStatus('✓ Files combined successfully!', 'success');
+        combineBtn.disabled = false;
+      },
+      (error) => {
+        showStatus('✗ Error: ' + error.message, 'error');
+        combineBtn.disabled = false;
+      }
+    );
   } catch (error) {
     showStatus('✗ Error: ' + error.message, 'error');
-  } finally {
     combineBtn.disabled = false;
   }
 });
-
 // ---------- CHECKLIST MODE ----------
 const addChecklistBtn = document.getElementById('addChecklistBtn');
 const checklistsContainer = document.getElementById('checklistsContainer');
@@ -291,7 +354,6 @@ combineChecklistBtn.addEventListener('click', async () => {
     return;
   }
 
-  showChecklistStatus('Generating PDF with dividers...', 'processing');
   combineChecklistBtn.disabled = true;
 
   try {
@@ -309,16 +371,24 @@ combineChecklistBtn.addEventListener('click', async () => {
 
     formData.append('checklist_data', JSON.stringify(checklistData));
 
-    const response = await fetch(`${API_BASE}/combine-checklist`, { method: 'POST', body: formData });
-    if (!response.ok) throw new Error('Combination failed');
-
-    const blob = await response.blob();
-    downloadFile(blob, `checklist_combined_${Date.now()}.pdf`);
-
-    showChecklistStatus('✓ PDF with dividers generated successfully!', 'success');
+    uploadWithProgress(
+      `${API_BASE}/combine-checklist`,
+      formData,
+      'checklist',
+      (blob) => {
+        downloadFile(blob, `checklist_combined_${Date.now()}.pdf`);
+        showChecklistStatus('✓ PDF with dividers generated successfully!', 'success');
+        combineChecklistBtn.disabled = false;
+      },
+      (error) => {
+        showChecklistStatus('✗ Error: ' + error.message, 'error');
+        combineChecklistBtn.disabled = false;
+      }
+    );
   } catch (error) {
     showChecklistStatus('✗ Error: ' + error.message, 'error');
-  } finally { combineChecklistBtn.disabled = false; }
+    combineChecklistBtn.disabled = false;
+  }
 });
 
 // ---------- UNI DOC BUILDER HELPERS ----------
@@ -434,7 +504,7 @@ function getIconClass(ext) {
 
 function formatFileSize(bytes) {
   if (!bytes) return '0 Bytes';
-  const k = 1024; const sizes = ['Bytes','KB','MB','GB'];
+  const k = 1024; const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 }
@@ -460,7 +530,7 @@ function hideChecklistStatus() { checklistStatusMessage.classList.remove('active
 
 // Simple escaping to avoid injected HTML from file names
 function escapeHtml(unsafe) {
-  return String(unsafe).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[c]);
+  return String(unsafe).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": "&#39;" })[c]);
 }
 
 // ---------- UniDoc action helpers ----------
@@ -468,7 +538,7 @@ const combineUniDocBtn = document.getElementById('combineUniDocBtn');
 const clearUniDocBtn = document.getElementById('clearUniDocBtn');
 const unidocStatusMessage = document.getElementById('unidocStatusMessage');
 
-function showUnidocStatus(message, type='') {
+function showUnidocStatus(message, type = '') {
   if (!unidocStatusMessage) return;
   unidocStatusMessage.className = 'status-message active ' + type;
   unidocStatusMessage.innerHTML = type === 'processing' ? `<div class="loader"></div>${message}` : message;
@@ -495,10 +565,10 @@ function clearUniDoc(resetTextInputs = true) {
     if (filenameSpan) filenameSpan.textContent = '';
 
     const previewBtn = ctrl.querySelector('.btn.preview');
-    const deleteBtn  = ctrl.querySelector('.btn.delete');
+    const deleteBtn = ctrl.querySelector('.btn.delete');
 
-    if (previewBtn)  { previewBtn.disabled = true; previewBtn.onclick = null; }
-    if (deleteBtn)   { deleteBtn.disabled = true;  deleteBtn.onclick = null;  }
+    if (previewBtn) { previewBtn.disabled = true; previewBtn.onclick = null; }
+    if (deleteBtn) { deleteBtn.disabled = true; deleteBtn.onclick = null; }
   });
 
   // 4) Optionally clear text fields at top (program, course code, etc.)
@@ -528,13 +598,11 @@ if (combineUniDocBtn) {
       return;
     }
 
-    showUnidocStatus('Merging Uni Docs into PDF...', 'processing');
     combineUniDocBtn.disabled = true;
 
     try {
       const formData = new FormData();
 
-      // 1) Append all files under the same key "files"
       for (const [key, payload] of uniDocFiles.entries()) {
         if (Array.isArray(payload)) {
           payload.forEach(f => formData.append("files", f));
@@ -543,7 +611,6 @@ if (combineUniDocBtn) {
         }
       }
 
-      // 2) Append the course meta fields (make sure inputs in HTML have these IDs)
       formData.append('program', document.querySelector('#programInput')?.value || '');
       formData.append('code', document.querySelector('#codeInput')?.value || '');
       formData.append('coordinator', document.querySelector('#coordinatorInput')?.value || '');
@@ -551,20 +618,26 @@ if (combineUniDocBtn) {
       formData.append('faculty', document.querySelector('#facultyInput')?.value || '');
       formData.append('ltpc', document.querySelector('#ltpcInput')?.value || '');
 
-      // 3) Call backend
-      const res = await fetchWithTimeout(`${API_BASE}/combine-unidoc`, { method: 'POST', body: formData });
-      if (!res.ok) throw new Error('Merge failed');
-      const blob = await res.blob();
-      downloadFile(blob, `unidoc_combined_${Date.now()}.pdf`);
-      showUnidocStatus('✓ UniDocs merged successfully!', 'success');
+      uploadWithProgress(
+        `${API_BASE}/combine-unidoc`,
+        formData,
+        'unidoc',
+        (blob) => {
+          downloadFile(blob, `unidoc_combined_${Date.now()}.pdf`);
+          showUnidocStatus('✓ UniDocs merged successfully!', 'success');
+          combineUniDocBtn.disabled = false;
+        },
+        (error) => {
+          showUnidocStatus('✗ Error: ' + error.message, 'error');
+          combineUniDocBtn.disabled = false;
+        }
+      );
     } catch (err) {
       showUnidocStatus('✗ Error: ' + err.message, 'error');
-    } finally {
       combineUniDocBtn.disabled = false;
     }
   });
 }
-
 
 
 
@@ -612,32 +685,12 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
-// Download Sample PDF button
-document.getElementById('downloadSampleBtn')?.addEventListener('click', function() {
-  // Create a temporary link to download the PDF
-  const link = document.createElement('a');
-  link.href = 'SAMPLE FILE.pdf'; // Replace with your actual PDF filename/path
-  link.download = 'Course_File_Sample.pdf';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  
-  // Optional: Show confirmation message
-  const statusMsg = document.getElementById('unidocStatusMessage');
-  if (statusMsg) {
-    statusMsg.textContent = '✅ Sample PDF downloaded!';
-    statusMsg.style.display = 'block';
-    statusMsg.style.color = '#10b981';
-    setTimeout(() => {
-      statusMsg.style.display = 'none';
-    }, 3000);
-  }
-});
+
 // Handle PWA install prompt
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  
+
   // Show install button after a short delay (better UX)
   setTimeout(() => {
     document.body.appendChild(installContainer);
@@ -649,26 +702,26 @@ window.addEventListener('beforeinstallprompt', (e) => {
 document.addEventListener('click', async (e) => {
   if (e.target.closest('#installBtn')) {
     if (!deferredPrompt) return;
-    
+
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    
+
     console.log(`User response: ${outcome}`);
-    
+
     if (outcome === 'accepted') {
       console.log('✅ PWA installed');
     }
-    
+
     deferredPrompt = null;
     installContainer.classList.remove('show');
-    
+
     setTimeout(() => {
       if (installContainer.parentNode) {
         installContainer.remove();
       }
     }, 400);
   }
-  
+
   // Close button
   if (e.target.closest('#closeInstall')) {
     installContainer.classList.remove('show');
@@ -680,11 +733,33 @@ document.addEventListener('click', async (e) => {
   }
 });
 
+// Download Sample PDF button
+document.getElementById('downloadSampleBtn')?.addEventListener('click', function () {
+  // Create a temporary link to download the PDF
+  const link = document.createElement('a');
+  link.href = 'SAMPLE FILE.pdf'; // Replace with your actual PDF filename/path
+  link.download = 'Course_File_Sample.pdf';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  // Optional: Show confirmation message
+  const statusMsg = document.getElementById('unidocStatusMessage');
+  if (statusMsg) {
+    statusMsg.textContent = '✅ Sample PDF downloaded!';
+    statusMsg.style.display = 'block';
+    statusMsg.style.color = '#10b981';
+    setTimeout(() => {
+      statusMsg.style.display = 'none';
+    }, 3000);
+  }
+});
+
 // Handle successful installation
 window.addEventListener('appinstalled', () => {
   console.log('✅ PWA was installed successfully');
   deferredPrompt = null;
-  
+
   if (installContainer.parentNode) {
     installContainer.remove();
   }
@@ -717,8 +792,8 @@ if (isIOS() && !isInStandaloneMode()) {
 // Detect if already installed
 window.addEventListener('DOMContentLoaded', () => {
   // Check if running as installed PWA
-  if (window.matchMedia('(display-mode: standalone)').matches || 
-      window.navigator.standalone === true) {
+  if (window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true) {
     console.log('✅ Running as installed PWA');
   }
 });
