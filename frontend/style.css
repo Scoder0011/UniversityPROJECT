@@ -2,15 +2,15 @@
    CSS Custom Properties (Design Tokens)
    ========================================================================== */
 :root {
-       /* Color Palette */
-    --color-primary: #7242d8;
-    --color-primary-dark: #7518d4;
-    --color-secondary: #010208;
-    --color-tertiary: #012372;
-    --color-accent: #000000;
+    /* Color Palette */
+    --color-primary: #667eea;
+    --color-primary-dark: #764ba2;
+    --color-secondary: #000d57;
+    --color-tertiary: #16213e;
+    --color-accent: #0f3460;
     
     --color-success: #27ae60;
-    --color-success-light: #c9e1cf;
+    --color-success-light: #d4edda;
     --color-success-dark: #155724;
     --color-success-border: #c3e6cb;
     
@@ -22,17 +22,16 @@
     --color-info: #3498db;
     --color-info-light: #d1ecf1;
     --color-info-dark: #0c5460;
-    --color-info-border: #bdd5d8;
+    --color-info-border: #bee5eb;
     
     --color-warning: #e67e22;
     
-    --color-neutral-100: #c6c9db;
+    --color-neutral-100: #f8f9ff;
     --color-neutral-200: #f0f0f0;
     --color-neutral-300: #e0e0e0;
     --color-neutral-400: #999;
     --color-neutral-500: #e0dada;
     --color-neutral-900: #1a1a2e;
-    
     
     --color-white: #ffffff;
     --color-overlay: rgba(255, 255, 255, 0.98);
@@ -1528,7 +1527,60 @@ textarea {
   right: -8px;
 }
 
+/* Progress Bar Styles - Add anywhere in your CSS file */
+.progress-container {
+  display: none;
+  margin-top: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  border-radius: 15px;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  position: relative;
+  width: 100%;
+}
 
+.progress-container.active {
+  display: block;
+  animation: fadeInUp 0.5s ease;
+}
+
+.progress-bar-wrapper {
+  width: 100%;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 15px;
+  transition: width 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
+.progress-text {
+  margin-top: 10px;
+  text-align: center;
+  font-weight: 600;
+  color: white;
+  font-size: 14px;
+}
+
+/* Adjust action buttons to prevent expansion */
+.action-buttons {
+  position: relative;
+  flex-wrap: wrap;
+}
 /* ==========================================================================
    Responsive Design
    ========================================================================== */
