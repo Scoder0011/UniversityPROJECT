@@ -16,6 +16,115 @@ function uploadWithProgress(url, formData, mode, onComplete, onError) {
   const progressText = document.getElementById(`${mode}ProgressText`);
   
   progressContainer.classList.add('active');
+
+
+   // ==================== VERSION CONTROL ====================
+const APP_VERSION = 'v4.1.2';
+console.log(`📱 File Combiner Pro ${APP_VERSION}`);
+
+// Service Worker registration with update handling
+if ('serviceWorker' in navigator) {
+  let refreshing = false;
+  
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return;
+    refreshing = true;
+    console.log('🔄 New version activated, reloading...');
+    window.location.reload();
+  });
+  
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(registration => {
+        console.log('✅ Service Worker registered');
+        
+        // Check for updates every minute
+        setInterval(() => {
+          registration.update();
+        }, 60000);
+        
+        // Handle updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          console.log('🆕 New version found!');
+          
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // Show update notification
+              showUpdateBanner();
+            }
+          });
+        });
+      })
+      .catch(error => {
+        console.error('❌ Service Worker registration failed:', error);
+      });
+  });
+}
+
+function showUpdateBanner() {
+  const banner = document.createElement('div');
+  banner.id = 'updateBanner';
+  banner.style.cssText = `
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 28px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.5);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    animation: slideIn 0.4s ease-out;
+  `;
+  
+  banner.innerHTML = `
+    <span style="font-size: 28px;">🎉</span>
+    <div>
+      <div style="font-weight: 600; font-size: 15px; margin-bottom: 4px;">New Update Available!</div>
+      <div style="font-size: 13px; opacity: 0.95;">Version ${APP_VERSION} is ready</div>
+    </div>
+    <button onclick="location.reload(true)" style="
+      background: white;
+      color: #667eea;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    ">
+      Update Now
+    </button>
+    <button onclick="this.parentElement.remove()" style="
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0 8px;
+      opacity: 0.8;
+    ">×</button>
+  `;
+  
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from { transform: translate(-50%, -30px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  document.body.appendChild(banner);
+}
   
   // Track upload progress
   xhr.upload.addEventListener('progress', (e) => {
