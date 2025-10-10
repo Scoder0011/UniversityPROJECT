@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://universityproject-igtz.onrender.com/sitemap.xml
